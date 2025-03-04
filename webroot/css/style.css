@@ -1,0 +1,838 @@
+/* Import Google Fonts for Professional Look */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+
+/* Reset default margin, padding, and box-sizing */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body Styling */
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f8f9fa;
+    color: #333;
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* ======= NAVIGATION BAR (Modern & Formal) ======= */
+.navbar {
+    background-color: #002147; /* Xavier Blue */
+    padding: 20px 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
+    border-bottom: 4px solid #ffd700; /* Gold separator */
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+}
+
+/* Left Section - Logo with Enhanced Styling */
+.navbar .logo {
+    color: white;
+    font-size: 28px;
+    font-weight: 700;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: opacity 0.3s ease-in-out;
+}
+
+/* Add an icon or university emblem (Optional) */
+.navbar .logo img {
+    height: 35px;
+    width: auto;
+}
+
+.navbar .logo:hover {
+    opacity: 0.85;
+}
+
+/* Right Section - Navigation Links */
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+}
+
+/* Navigation Links */
+.nav-right a {
+    color: white;
+    text-decoration: none;
+    font-size: 17px;
+    font-weight: 600;
+    padding: 12px 20px;
+    border-radius: 6px;
+    transition: all 0.3s ease-in-out;
+    position: relative;
+}
+
+/* Underline Effect for Professional Feel */
+.nav-right a::after {
+    content: "";
+    display: block;
+    width: 100%;
+    height: 3px;
+    background: transparent;
+    position: absolute;
+    bottom: -6px;
+    left: 0;
+    transition: background 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+.nav-right a:hover::after {
+    background: #ffd700; /* Gold */
+    transform: scaleX(1);
+}
+
+/* Smooth Hover Transition */
+.nav-right a:hover {
+    color: #ffd700;
+}
+
+/* Call-to-Action Button */
+.nav-right .cta-btn {
+    background: #ffd700;
+    color: #002147;
+    font-weight: 600;
+    padding: 12px 24px;
+    border-radius: 6px;
+    transition: background 0.3s ease-in-out, transform 0.1s ease-in-out;
+    box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.2);
+}
+
+.nav-right .cta-btn:hover {
+    background: #e6a000;
+    transform: translateY(-2px);
+}
+
+/* Horizontal Separator Under Navbar */
+.navbar::after {
+    content: "";
+    display: block;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(to right, #ffd700 0%, #002147 100%);
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+}
+
+/* Styling for Side Navigation */
+.side-nav {
+    background-color: #002147; /* Xavier Blue */
+    padding: 15px;
+    border-radius: 5px;
+    color: white;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.side-nav .heading {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.side-nav-item {
+    display: block;
+    color: white;
+    background-color: #ffd700; /* Xavier Gold */
+    padding: 10px;
+    margin: 5px 0;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background 0.3s ease-in-out;
+}
+
+.side-nav-item:hover {
+    background-color: #ffcc00;
+}
+
+/* Page Container */
+.container {
+    max-width: 95%;
+    margin: 40px auto;
+    padding: 25px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* ====== HEADER STYLING (Elegant & Well-Spaced) ====== */
+h1, h2 {
+    color: #002147;
+    font-weight: 700;
+    margin-bottom: 25px;
+    font-family: 'Roboto', sans-serif;
+    text-align: center;
+    position: relative;
+}
+
+/* Stylish Header Design */
+h1 {
+    font-size: 42px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-top: 70px; /* Push the h1 down */
+}
+
+
+/* Professional Header with Subtle Divider */
+h2 {
+    font-size: 30px;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+/* Gold Underline for Headers */
+h1::after, h2::after {
+    content: "";
+    display: block;
+    width: 80px;
+    height: 5px;
+    background: #ffd700; /* Gold */
+    margin: 15px auto;
+    border-radius: 3px;
+}
+
+/* Proper Line Spacing for Readability */
+h1, h2 {
+    line-height: 1.5;
+}
+
+/* Section Dividers */
+.section-divider {
+    width: 100%;
+    height: 6px;
+    background: linear-gradient(to right, #ffd700 0%, #002147 100%);
+    margin: 40px 0;
+    border-radius: 3px;
+}
+
+/* ====== MEDIA RESPONSIVENESS ====== */
+@media (max-width: 992px) {
+    .navbar {
+        padding: 15px 40px;
+    }
+
+    .nav-right {
+        gap: 25px;
+    }
+
+    .nav-right a {
+        font-size: 15px;
+        padding: 10px 14px;
+    }
+
+    .navbar .logo {
+        font-size: 24px;
+    }
+
+    h1 {
+        font-size: 34px;
+    }
+
+    h2 {
+        font-size: 26px;
+    }
+}
+
+/* Table Styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    padding: 14px;
+    text-align: center;
+    border-bottom: 2px solid #ddd;
+}
+
+th {
+    background-color: #002147;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+td {
+    background-color: #fdfdfd;
+}
+
+tr:nth-child(even) {
+    background-color: #f4f4f4;
+}
+
+tr:hover {
+    background-color: #e9ecef;
+}
+
+/* Improve Table Header Styling */
+th {
+    background-color: #002147; /* Xavier University Blue */
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 12px;
+    text-align: center;
+    border-bottom: 3px solid #FFD700; /* Gold Underline */
+}
+
+/* Remove link styles from table headers */
+th a {
+    text-decoration: none !important;
+    color: inherit !important;
+    font-weight: bold;
+    pointer-events: none;
+    cursor: default;
+}
+
+/* ====== Align Action Buttons (SIDE BY SIDE) ====== */
+.button-group {
+    display: flex;
+    flex-direction: row; /* Ensures buttons are in a row */
+    gap: 10px; /* Adds spacing between buttons */
+    justify-content: center;
+    align-items: center;
+}
+
+/* Common Button Styles */
+.view-btn, .edit-btn, .delete-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 120px; /* Ensure same width */
+    height: 40px; /* Ensure same height */
+    padding: 10px 14px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    text-decoration: none;
+    color: white;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out, transform 0.1s ease-in-out;
+    gap: 8px; /* Space between icon and text */
+}
+
+/* Ensures icons inside the buttons are aligned */
+.view-btn i, .edit-btn i, .delete-btn i {
+    font-size: 16px;
+}
+
+/* Hover effect with slight scaling */
+.view-btn:hover, .edit-btn:hover, .delete-btn:hover {
+    transform: translateY(-2px);
+}
+
+/* View Button - Xavier Blue */
+.view-btn {
+    background-color: #002147;
+}
+
+.view-btn:hover {
+    background-color: #003366;
+}
+
+/* Edit Button - Xavier Gold */
+.edit-btn {
+    background-color: #ffd700;
+    color: #002147;
+}
+
+.edit-btn:hover {
+    background-color: #ffcc00;
+}
+
+/* Delete Button - Soft Red */
+.delete-btn {
+    background-color: #dc3545;
+    width: 430px; /* Adjusted width for better balance */
+    height: 42px; /* Slightly increased height to match */
+    padding: 12px 14px; /* Improved padding */
+}
+
+.delete-btn:hover {
+    background-color: #c82333;
+}
+
+
+
+/* Icons for View, Edit, Delete */
+.view-btn::before {
+    content: "\1F441"; /* Eye emoji */
+    font-size: 20px;
+}
+
+.edit-btn::before {
+    content: "\270F"; /* Pencil emoji */
+    font-size: 20px;
+}
+
+.delete-btn::before {
+    content: "\1F5D1"; /* Trash bin emoji */
+    font-size: 20px;
+}
+
+
+/* Pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.pagination a {
+    background-color: #002147;
+    color: white;
+    padding: 10px 15px;
+    margin: 5px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: background 0.3s ease-in-out;
+}
+
+.pagination a:hover {
+    background-color: #0056b3;
+}
+
+/* Footer */
+.footer {
+    text-align: center;
+    padding: 15px;
+    background-color: #002147;
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+    margin-top: auto;
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+}
+
+/* Form Container */
+.items.form.content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+fieldset {
+    border: none;
+    margin: 0;
+    padding: 0;
+}
+
+legend {
+    font-size: 22px;
+    font-weight: bold;
+    color: #002147;
+    margin-bottom: 15px;
+}
+
+label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 8px;
+    color: #002147;
+}
+
+input[type="text"], 
+input[type="number"], 
+input[type="email"], 
+textarea, 
+select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    font-size: 16px;
+}
+
+select {
+    background-color: #fff;
+    cursor: pointer;
+}
+
+input[type="submit"], .button {
+    background-color: #002147;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s ease-in-out;
+    display: block;
+    width: 100%;
+    text-align: center;
+    font-weight: bold;
+}
+
+input[type="submit"]:hover, .button:hover {
+    background-color: #0056b3;
+}
+
+/* Responsive Layout */
+@media screen and (max-width: 768px) {
+    .column {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .items.form.content {
+        width: 90%;
+    }
+}
+/* ====== HERO SECTION (More Relevant to UAO & Borrowers) ====== */
+.hero-section {
+    position: relative;
+    background: url('img/hero-bg.jpg') center/cover no-repeat;
+    color: white;
+    text-align: center;
+    padding: 140px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    border-bottom: 4px solid #ffd700;
+    height: 75vh;
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 33, 71, 0.7);
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 750px;
+}
+
+.hero-content h1 {
+    font-size: 42px;
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+.hero-content p {
+    font-size: 22px;
+    margin-bottom: 25px;
+}
+
+/* ====== BORROWING SECTION (Students & Teachers) ====== */
+.borrowing-section {
+    text-align: center;
+    padding: 80px 20px;
+    background: white;
+}
+
+.section-title {
+    font-size: 30px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #002147;
+}
+
+.section-subtitle {
+    font-size: 18px;
+    margin-bottom: 40px;
+    color: #555;
+}
+
+.borrowing-grid {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+    max-width: 1100px;
+    margin: auto;
+}
+
+.borrowing-item {
+    background: #f8f9fa;
+    padding: 30px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+    max-width: 350px;
+    border: 3px solid #002147;
+    transition: transform 0.3s ease-in-out;
+}
+
+.borrowing-item img {
+    width: 60px;
+    margin-bottom: 15px;
+}
+
+.borrowing-item:hover {
+    transform: translateY(-5px);
+}
+
+/* ====== STAFF SECTION (UAO Admins) ====== */
+.staff-section {
+    text-align: center;
+    padding: 80px 20px;
+    background: #f8f9fa;
+}
+
+.staff-grid {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+    max-width: 1100px;
+    margin: auto;
+}
+
+.staff-item {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+    max-width: 350px;
+    border: 3px solid #002147;
+    transition: transform 0.3s ease-in-out;
+}
+
+.staff-item img {
+    width: 60px;
+    margin-bottom: 15px;
+}
+
+.staff-item:hover {
+    transform: translateY(-5px);
+}
+
+/* ====== ABOUT SECTION (More Informative) ====== */
+.about-section {
+    text-align: center;
+    padding: 80px 20px;
+    background: white;
+    border-top: 4px solid #ffd700;
+}
+
+.about-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 1100px;
+    margin: auto;
+    gap: 40px;
+    flex-wrap: wrap;
+}
+
+.about-text {
+    flex: 1;
+    text-align: left;
+    max-width: 500px;
+}
+
+.about-text h2 {
+    font-size: 28px;
+    font-weight: bold;
+    color: #002147;
+    margin-bottom: 20px;
+}
+
+.about-text p {
+    font-size: 18px;
+    color: #333;
+    line-height: 1.6;
+}
+
+.about-image {
+    flex: 1;
+    max-width: 450px;
+}
+
+.about-image img {
+    width: 100%;
+    border-radius: 12px;
+    box-shadow: 3px 3px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* ====== RESPONSIVE DESIGN ====== */
+@media (max-width: 1024px) {
+    .hero-section {
+        padding: 120px 20px;
+        height: auto;
+    }
+
+    .hero-content h1 {
+        font-size: 38px;
+    }
+
+    .hero-content p {
+        font-size: 18px;
+    }
+
+    .borrowing-grid, .staff-grid {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .about-container {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+/* INVENTORY PAGE */
+.inventory-container {
+    max-width: 1100px;
+    margin: auto;
+    padding: 20px;
+}
+
+/* Page Title */
+.inventory-title {
+    text-align: center;
+    font-size: 28px;
+    font-weight: bold;
+    color: #002147;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #FFD700;
+    padding-bottom: 10px;
+}
+
+/* FILTER & SEARCH SECTION */
+.filter-search-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+/* Filter Dropdown */
+.filter-dropdown {
+    padding: 8px;
+    border-radius: 6px;
+    font-size: 16px;
+}
+
+/* Search Bar */
+.search-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.search-input {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 16px;
+}
+
+/* Buttons */
+.filter-btn, .search-btn {
+    background: #002147;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.filter-btn:hover, .search-btn:hover {
+    background: #003366;
+}
+
+/* CATEGORIZED SECTIONS */
+.category-section {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 2px solid #FFD700;
+}
+
+.category-title {
+    font-size: 22px;
+    font-weight: bold;
+    color: #002147;
+    margin-bottom: 15px;
+}
+
+/* TABLE STYLING */
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+th, td {
+    padding: 10px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #002147;
+    color: white;
+    font-weight: bold;
+}
+
+tr:nth-child(even) {
+    background-color: #f4f4f4;
+}
+
+tr:hover {
+    background-color: #e9ecef;
+}
+
+/* ACTION BUTTONS */
+.button-group {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+}
+
+.view-btn, .edit-btn, .delete-btn {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: bold;
+    text-decoration: none;
+    color: white;
+}
+
+.view-btn { background: #004a99; }
+.edit-btn { background: #FFD700; color: #002147; }
+.delete-btn { background: #dc3545; }
+
+
+
