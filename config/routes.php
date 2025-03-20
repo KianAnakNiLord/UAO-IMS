@@ -94,3 +94,7 @@ return function (RouteBuilder $routes): void {
      * ```
      */
 };
+
+$routes->scope('/', function (RouteBuilder $routes) {
+    $routes->connect('/borrowings', ['controller' => 'Borrowings', 'action' => 'index']);
+});

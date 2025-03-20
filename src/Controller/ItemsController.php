@@ -6,37 +6,23 @@ namespace App\Controller;
 /**
  * Items Controller
  *
+ * Handles inventory item management.
+ *
  * @property \App\Model\Table\ItemsTable $Items
  */
 class ItemsController extends AppController
 {
     /**
-     * Index method - Lists all items with filtering & search
-     *
-     * @return \Cake\Http\Response|null|void Renders view
+     * Index method - Lists all items
      */
     public function index()
     {
-        $query = $this->Items->find();
-
-        // Filter by Category
-        $category = $this->request->getQuery('category');
-        if (!empty($category)) {
-            $query->where(['category' => $category]);
-        }
-
-        // Search by Item Name
-        $search = $this->request->getQuery('search');
-        if (!empty($search)) {
-            $query->where(['name LIKE' => '%' . $search . '%']);
-        }
-
-        $items = $this->paginate($query);
+        $items = $this->paginate($this->Items);
         $this->set(compact('items'));
     }
 
     /**
-     * View method
+     * View method - Shows details of a single item
      *
      * @param string|null $id Item id.
      * @return \Cake\Http\Response|null|void Renders view
@@ -44,14 +30,12 @@ class ItemsController extends AppController
      */
     public function view($id = null)
     {
-        $item = $this->Items->get($id, contain: []);
+        $item = $this->Items->get($id);
         $this->set(compact('item'));
     }
 
     /**
-     * Add method
-     *
-     * @return \Cake\Http\Response|null|void Redirects on successful add, renders view otherwise.
+     * Add method - Adds a new item
      */
     public function add()
     {
@@ -59,24 +43,23 @@ class ItemsController extends AppController
         if ($this->request->is('post')) {
             $item = $this->Items->patchEntity($item, $this->request->getData());
             if ($this->Items->save($item)) {
-                $this->Flash->success(__('The item has been saved.'));
+                $this->Flash->success(__('The item has been added.'));
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The item could not be saved. Please, try again.'));
+            $this->Flash->error(__('The item could not be added. Please, try again.'));
         }
         $this->set(compact('item'));
     }
 
     /**
-     * Edit method
+     * Edit method - Updates an existing item
      *
      * @param string|null $id Item id.
      * @return \Cake\Http\Response|null|void Redirects on successful edit, renders view otherwise.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
     public function edit($id = null)
     {
-        $item = $this->Items->get($id, contain: []);
+        $item = $this->Items->get($id);
         if ($this->request->is(['patch', 'post', 'put'])) {
             $item = $this->Items->patchEntity($item, $this->request->getData());
             if ($this->Items->save($item)) {
@@ -89,11 +72,10 @@ class ItemsController extends AppController
     }
 
     /**
-     * Delete method
+     * Delete method - Removes an item
      *
      * @param string|null $id Item id.
      * @return \Cake\Http\Response|null Redirects to index.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
     public function delete($id = null)
     {

@@ -1,0 +1,109 @@
+<?php
+declare(strict_types=1);
+
+namespace App\Controller;
+
+/**
+ * Borrowers Controller
+ *
+ * Manages borrower records and their borrowings.
+ */
+class BorrowersController extends AppController
+{
+    /**
+     * Index method - Lists all borrowers with search functionality
+     *
+     * @return \Cake\Http\Response|null|void Renders view
+     */
+    public function index()
+    {
+        $query = $this->Borrowers->find();
+
+        // Search by Borrower Name
+        $search = $this->request->getQuery('search');
+        if (!empty($search)) {
+            $query->where(['name LIKE' => '%' . $search . '%']);
+        }
+
+        $borrowers = $this->paginate($query);
+        $this->set(compact('borrowers'));
+    }
+
+    /**
+     * View method - Displays borrower details and borrowed items
+     *
+     * @param string|null $id Borrower id.
+     * @return \Cake\Http\Response|null|void Renders view
+     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
+     */
+    public function view($id = null)
+    {
+        $borrower = $this->Borrowers->get($id, [
+            'contain' => ['Borrowings' => ['Items']], // Nested association
+        ]);
+
+        $this->set(compact('borrower'));
+    }
+
+    /**
+     * Add method - Adds a new borrower
+     *
+     * @return \Cake\Http\Response|null|void Redirects on successful add, renders view otherwise.
+     */
+    public function addborrower()
+    {
+        $borrower = $this->Borrowers->newEmptyEntity();
+        
+        if ($this->request->is('post')) {
+            $borrower = $this->Borrowers->patchEntity($borrower, $this->request->getData());
+            
+            if ($this->Borrowers->save($borrower)) {
+                $this->Flash->success(__('The borrower has been added.'));
+                return $this->redirect(['action' => 'index']);
+            }
+            $this->Flash->error(__('The borrower could not be added. Please, try again.'));
+        }
+    
+        $this->set(compact('borrower'));
+    }
+
+    /**
+     * Edit method - Edits an existing borrower
+     *
+     * @param string|null $id Borrower id.
+     * @return \Cake\Http\Response|null|void Redirects on successful edit, renders view otherwise.
+     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
+     */
+    public function edit($id = null)
+    {
+        $borrower = $this->Borrowers->get($id);
+        if ($this->request->is(['patch', 'post', 'put'])) {
+            $borrower = $this->Borrowers->patchEntity($borrower, $this->request->getData());
+            if ($this->Borrowers->save($borrower)) {
+                $this->Flash->success(__('The borrower has been updated.'));
+                return $this->redirect(['action' => 'index']);
+            }
+            $this->Flash->error(__('The borrower could not be updated. Please, try again.'));
+        }
+        $this->set(compact('borrower'));
+    }
+
+    /**
+     * Delete method - Deletes a borrower
+     *
+     * @param string|null $id Borrower id.
+     * @return \Cake\Http\Response|null Redirects to index.
+     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
+     */
+    public function delete($id = null)
+    {
+        $this->request->allowMethod(['post', 'delete']);
+        $borrower = $this->Borrowers->get($id);
+        if ($this->Borrowers->delete($borrower)) {
+            $this->Flash->success(__('The borrower has been deleted.'));
+        } else {
+            $this->Flash->error(__('The borrower could not be deleted. Please, try again.'));
+        }
+        return $this->redirect(['action' => 'index']);
+    }
+}

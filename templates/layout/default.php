@@ -24,7 +24,8 @@ $cakeDescription = 'Sports Office IMS - Xavier University';
     <!-- Navigation Bar -->
     <nav class="navbar">
         <div class="nav-left">
-            <a href="<?= $this->Url->build('/') ?>" class="logo">Sports Office IMS</a>
+            
+            <a href="<?= $this->Url->build('/') ?>" class="logo"><?= $this->Html->image('cruslogo.png', ['alt' => 'Crusaders Logo']) ?>Sports Office IMS</a>
         </div>
         <div class="nav-right">
             <a href="<?= $this->Url->build('/') ?>">Home</a>

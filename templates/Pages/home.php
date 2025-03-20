@@ -2,14 +2,13 @@
 /**
  * @var \App\View\AppView $this
  */
-$this->assign('title', 'Sports Office Inventory Management System');
+$this->assign('title', 'XUAO Inventory Management System');
 ?>
-
 <!-- Hero Section -->
 <div class="hero-section">
     <div class="hero-overlay"></div>
     <div class="hero-content">
-        <h1>Welcome to the Sports Office IMS</h1>
+        <h1>Welcome to the Athletics Office IMS</h1>
         <p>Simplifying the management and borrowing of sports equipment for students, teachers, and staff.</p>
         <?= $this->Html->link(__('Request Equipment'), ['controller' => 'Borrowings', 'action' => 'index'], ['class' => 'button button-highlight']) ?>
     </div>
