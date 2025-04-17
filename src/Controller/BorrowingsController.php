@@ -24,7 +24,7 @@ class BorrowingsController extends AppController
     {
         parent::initialize();
 
-        // ✅ Use dependency injection instead of loadModel()
+       
         $this->Borrowings = $this->fetchTable('Borrowings');
         $this->Borrowers = $this->fetchTable('Borrowers');
         $this->Items = $this->fetchTable('Items');
@@ -59,19 +59,24 @@ class BorrowingsController extends AppController
     public function add()
     {
         $borrowing = $this->Borrowings->newEmptyEntity();
-        
+    
         if ($this->request->is('post')) {
             $borrowing = $this->Borrowings->patchEntity($borrowing, $this->request->getData());
     
+            // Set approval status to pending
+            $borrowing->approval_status = 'pending';
+    
+            // Optional: set borrowed status too
+            $borrowing->status = 'waiting'; // or leave null if not needed yet
+    
             if ($this->Borrowings->save($borrowing)) {
-                $this->Flash->success(__('The borrowing record has been saved.'));
-                return $this->redirect(['action' => 'index']); // ✅ Redirect to index
+                $this->Flash->success(__('Your borrow request has been sent for approval.'));
+                return $this->redirect(['action' => 'index']);
             }
     
-            $this->Flash->error(__('The borrowing record could not be saved. Please, try again.'));
+            $this->Flash->error(__('The borrow request could not be submitted. Please, try again.'));
         }
     
-        // Fetch borrowers and items for dropdown selection
         $borrowers = $this->Borrowings->Borrowers->find('list');
         $items = $this->Borrowings->Items->find('list');
     
@@ -130,4 +135,32 @@ class BorrowingsController extends AppController
         }
         return $this->redirect(['action' => 'index']);
     }
+
+    public function approve($id)
+{
+    $borrowing = $this->Borrowings->get($id);
+    $borrowing->status = 'approved';
+
+    if ($this->Borrowings->save($borrowing)) {
+        $this->Flash->success(__('Borrow request approved.'));
+    } else {
+        $this->Flash->error(__('Unable to approve the request.'));
+    }
+
+    return $this->redirect(['action' => 'index']);
+}
+
+public function reject($id)
+{
+    $borrowing = $this->Borrowings->get($id);
+    $borrowing->status = 'rejected';
+
+    if ($this->Borrowings->save($borrowing)) {
+        $this->Flash->success(__('Borrow request rejected.'));
+    } else {
+        $this->Flash->error(__('Unable to reject the request.'));
+    }
+
+    return $this->redirect(['action' => 'index']);
+}
 }

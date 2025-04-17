@@ -52,21 +52,22 @@ class BorrowingsTable extends Table
             ->integer('borrower_id')
             ->requirePresence('borrower_id', 'create')
             ->notEmptyString('borrower_id', 'Borrower ID is required');
-
+    
         $validator
             ->integer('item_id')
             ->requirePresence('item_id', 'create')
             ->notEmptyString('item_id', 'Item ID is required');
-
+    
+        // ✅ Fix field name to match the database column
         $validator
-            ->dateTime('borrowed_at')
-            ->requirePresence('borrowed_at', 'create')
-            ->notEmptyDateTime('borrowed_at', 'Borrowed date and time are required');
-
+            ->date('borrowed_date')
+            ->requirePresence('borrowed_date', 'create')
+            ->notEmptyDate('borrowed_date', 'Borrowed date is required');
+    
         $validator
-            ->dateTime('returned_at')
-            ->allowEmptyDateTime('returned_at');
-
+            ->date('return_date') // assuming this is your due date
+            ->allowEmptyDate('return_date');
+    
         return $validator;
     }
 }

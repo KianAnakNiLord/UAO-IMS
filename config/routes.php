@@ -21,8 +21,8 @@
  * @license       https://opensource.org/licenses/mit-license.php MIT License
  */
 
-use Cake\Routing\Route\DashedRoute;
-use Cake\Routing\RouteBuilder;
+ use Cake\Routing\Route\DashedRoute;
+ use Cake\Routing\RouteBuilder;
 
 /*
  * This file is loaded in the context of the `Application` class.
@@ -62,6 +62,8 @@ return function (RouteBuilder $routes): void {
          */
         $builder->connect('/pages/*', 'Pages::display');
 
+        
+
         /*
          * Connect catchall routes for all controllers.
          *
@@ -93,8 +95,12 @@ return function (RouteBuilder $routes): void {
      * });
      * ```
      */
+    $routes->prefix('Admin', function (RouteBuilder $builder) {
+        $builder->setRouteClass(DashedRoute::class);
+    
+        // Route /admin to DashboardController
+        $builder->connect('/', ['controller' => 'Dashboard', 'action' => 'index']);
+    
+        $builder->fallbacks(DashedRoute::class);
+    });
 };
-
-$routes->scope('/', function (RouteBuilder $routes) {
-    $routes->connect('/borrowings', ['controller' => 'Borrowings', 'action' => 'index']);
-});
