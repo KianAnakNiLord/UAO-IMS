@@ -1,0 +1,85 @@
+/* =============================
+   🎽 Borrow Request Form Styles
+   ============================= */
+
+   body {
+    background-color: #f5f7fa;
+    font-family: "Segoe UI", sans-serif;
+}
+
+/* Layout */
+.borrowRequests.form.content {
+    background: #fff;
+    padding: 40px;
+    margin: 40px auto;
+    border-radius: 10px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.07);
+    max-width: 700px;
+}
+
+legend {
+    font-size: 24px;
+    color: #3A53A4;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+/* Form fields */
+input[type="text"],
+input[type="email"],
+input[type="number"],
+input[type="password"],
+select,
+textarea,
+input[type="date"] {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 18px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 15px;
+    transition: border 0.3s ease-in-out;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: #3A53A4;
+    outline: none;
+}
+
+/* Submit Button */
+button[type="submit"] {
+    background-color: #3A53A4;
+    color: white;
+    padding: 12px 18px;
+    border: none;
+    border-radius: 6px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button[type="submit"]:hover {
+    background-color: #2e418a;
+}
+
+/* Sidebar Navigation (optional) */
+.side-nav h4 {
+    color: #3A53A4;
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.side-nav-item {
+    display: block;
+    padding: 10px 0;
+    text-decoration: none;
+    color: #3A53A4;
+    font-weight: 500;
+}
+
+.side-nav-item:hover {
+    text-decoration: underline;
+}

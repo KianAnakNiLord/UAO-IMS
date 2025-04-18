@@ -1,0 +1,194 @@
+/* ================================
+   🧾 Borrow Requests Table Styling
+   ================================ */
+
+   body {
+    background-color: #f5f7fa;
+    font-family: "Segoe UI", sans-serif;
+}
+
+/* Wrapper */
+.borrowRequests.index.content {
+    padding: 40px;
+    background-color: #fff;
+    margin: 40px auto;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+    max-width: 1300px;
+}
+
+/* Header + Button */
+.borrowRequests h3 {
+    color: #3A53A4;
+    font-size: 26px;
+    margin-bottom: 25px;
+}
+
+.borrowRequests .button.float-right {
+    float: right;
+    background-color: #3A53A4;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-weight: 500;
+    text-decoration: none;
+    margin-bottom: 20px;
+}
+
+.borrowRequests .button.float-right:hover {
+    background-color: #2f418a;
+}
+
+/* Table */
+.table-responsive table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.table-responsive th,
+.table-responsive td {
+    padding: 12px 14px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.table-responsive thead {
+    background-color: #3A53A4;
+    color: white;
+}
+
+.table-responsive td span {
+    font-weight: bold;
+}
+
+/* Status Colors */
+.table-responsive td span[style*="green"] {
+    color: #28a745 !important;
+}
+.table-responsive td span[style*="orange"] {
+    color: #fd7e14 !important;
+}
+.table-responsive td span[style*="red"] {
+    color: #dc3545 !important;
+}
+.table-responsive td span[style*="blue"] {
+    color: #007bff !important;
+}
+.table-responsive td span[style*="darkred"] {
+    color: #800000 !important;
+}
+
+/* Paginator */
+.paginator {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.pagination {
+    display: inline-flex;
+    list-style: none;
+    padding: 0;
+    gap: 6px;
+}
+
+.pagination li {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    padding: 6px 12px;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.pagination li:hover {
+    background-color: #3A53A4;
+    color: white;
+    cursor: pointer;
+}
+
+.pagination .current {
+    background-color: #3A53A4;
+    color: white;
+    font-weight: bold;
+}
+
+/* Make table header sort links look like regular headers */
+th a {
+    color: white;             /* Makes the link white to match the header */
+    text-decoration: none;   /* Removes underline */
+    font-weight: bold;
+}
+
+th a:hover {
+    text-decoration: underline;
+}
+
+/* Action buttons inside table */
+.actions a,
+.actions form {
+    display: inline-block;
+    margin-right: 5px;
+}
+
+/* Base style for action links */
+.actions a,
+.actions input[type="submit"] {
+    background-color: #3A53A4;
+    color: white;
+    padding: 6px 12px;
+    font-size: 13px;
+    border: none;
+    border-radius: 4px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+/* Hover state */
+.actions a:hover,
+.actions input[type="submit"]:hover {
+    background-color: #2f418a;
+}
+
+/* Delete (danger) override */
+.actions .danger-btn {
+    background-color: #dc3545;
+}
+
+.actions .danger-btn:hover {
+    background-color: #bd2130;
+}
+
+/* Flex layout for action buttons */
+td.actions {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    justify-content: center;
+}
+
+td.actions a,
+td.actions form {
+    display: inline-block;
+    margin: 0 !important; /* Remove default margin spacing */
+}
+
+/* Inventory Item and User name links */
+td a {
+    color: #3A53A4;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+td a:hover {
+    text-decoration: underline;
+}
+
+td {
+    vertical-align: middle;
+}
+
+.table-responsive td {
+    white-space: nowrap;
+}
+
