@@ -43,5 +43,6 @@ class BorrowRequest extends Entity
         'modified' => true,
         'user' => true,
         'inventory_item' => true,
+        'return_time' => true, // Make sure return_time is included here
     ];
 }

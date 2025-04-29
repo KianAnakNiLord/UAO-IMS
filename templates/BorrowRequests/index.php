@@ -13,32 +13,22 @@
         <table>
             <thead>
                 <tr>
-                    <th><?= $this->Paginator->sort('id') ?></th>
-                    <th><?= $this->Paginator->sort('user_id') ?></th>
-                    <th><?= $this->Paginator->sort('inventory_item_id') ?></th>
+                    <th><?= __('Inventory Item') ?></th>
                     <th><?= __('Quantity') ?></th>
-                    <th><?= $this->Paginator->sort('status') ?></th>
-                    <th><?= $this->Paginator->sort('request_date') ?></th>
-                    <th><?= $this->Paginator->sort('return_date') ?></th>
-                    <th><?= $this->Paginator->sort('created') ?></th>
-                    <th><?= $this->Paginator->sort('modified') ?></th>
+                    <th><?= __('Status') ?></th>
+                    <th><?= __('Request Date') ?></th>
+                    <th><?= __('Return Date') ?></th>
+                    <th><?= __('Return Time') ?></th> <!-- Added Return Time column -->
+                    <th><?= __('Created') ?></th>
+
                     <th class="actions"><?= __('Actions') ?></th>
                 </tr>
             </thead>
             <tbody>
                 <?php foreach ($borrowRequests as $borrowRequest): ?>
                 <tr>
-                    <td><?= $this->Number->format($borrowRequest->id) ?></td>
-                    <td>
-                        <?= $borrowRequest->hasValue('user')
-                            ? $this->Html->link($borrowRequest->user->name, ['controller' => 'Users', 'action' => 'view', $borrowRequest->user->id])
-                            : '' ?>
-                    </td>
-                    <td>
-                        <?= $borrowRequest->hasValue('inventory_item')
-                            ? $this->Html->link($borrowRequest->inventory_item->name, ['controller' => 'InventoryItems', 'action' => 'view', $borrowRequest->inventory_item->id])
-                            : '' ?>
-                    </td>
+                    <!-- Display Inventory Item as plain text -->
+                    <td><?= h($borrowRequest->inventory_item->name) ?></td>
                     <td><?= h($borrowRequest->quantity_requested) ?> pcs</td>
                     <td>
                         <?php
@@ -53,35 +43,36 @@
                             };
                         ?>
                         <span style="color: <?= $color ?>;">
-                            <?= ucfirst(h($status)) ?>
+                             <?= ucfirst(h($status)) ?>
                         </span>
                         <?php if ($status === 'rejected' && $borrowRequest->rejection_reason): ?>
-                            <br><small><strong>Reason:</strong> <?= h($borrowRequest->rejection_reason) ?></small>
+                            <br>
+                            <?= $this->Html->link('View Reason', ['action' => 'viewReason', $borrowRequest->id], ['class' => 'view-reason-link']) ?>
                         <?php endif; ?>
                     </td>
                     <td><?= h($borrowRequest->request_date) ?></td>
                     <td><?= h($borrowRequest->return_date) ?></td>
+                    <!-- Display Return Time -->
+                    <td><?= h($borrowRequest->return_time ?? 'N/A') ?></td> <!-- Fallback to N/A if return_time is empty -->
                     <td><?= h($borrowRequest->created) ?></td>
-                    <td><?= h($borrowRequest->modified) ?></td>
-                    <td class="actions">
-    <?= $this->Html->link(__('View'), ['action' => 'view', $borrowRequest->id], ['title' => 'View this request']) ?>
-    <?= $this->Html->link(__('Edit'), ['action' => 'edit', $borrowRequest->id], ['title' => 'Edit this request']) ?>
-    <?= $this->Form->postLink(
-        __('Delete'),
-        ['action' => 'delete', $borrowRequest->id],
-        [
-            'confirm' => __('Are you sure you want to delete # {0}?', $borrowRequest->id),
-            'class' => 'danger-btn',
-            'title' => 'Delete this request'
-        ]
-    ) ?>
-</td>
 
+                    <td class="actions">
+                        <?= $this->Form->postLink(
+                            __('Delete'),
+                            ['action' => 'delete', $borrowRequest->id],
+                            [
+                                'confirm' => __('Are you sure you want to delete # {0}?', $borrowRequest->id),
+                                'class' => 'danger-btn',
+                                'title' => 'Delete this request'
+                            ]
+                        ) ?>
+                    </td>
                 </tr>
                 <?php endforeach; ?>
             </tbody>
         </table>
     </div>
+
     <div class="paginator">
         <ul class="pagination">
             <?= $this->Paginator->first('<< ' . __('first')) ?>

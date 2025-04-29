@@ -15,6 +15,7 @@
                     <th><?= $this->Paginator->sort('role') ?></th>
                     <th><?= $this->Paginator->sort('name') ?></th>
                     <th><?= $this->Paginator->sort('email') ?></th>
+                    <th><?= __('Return Time') ?></th> <!-- New column for Return Time -->
                     <th><?= $this->Paginator->sort('created') ?></th>
                     <th><?= $this->Paginator->sort('modified') ?></th>
                     <th class="actions"><?= __('Actions') ?></th>
@@ -27,6 +28,17 @@
                     <td><?= h($user->role) ?></td>
                     <td><?= h($user->name) ?></td>
                     <td><?= h($user->email) ?></td>
+                    <td>
+                        <?php
+                        // Check if there is a related BorrowRequest and display the return_time
+                        if (!empty($user->borrow_requests)) {
+                            $borrowRequest = $user->borrow_requests[0]; // Assuming you want the first borrow request
+                            echo h($borrowRequest->return_time);  // Display return_time
+                        } else {
+                            echo 'N/A';  // If no borrow request exists
+                        }
+                        ?>
+                    </td>
                     <td><?= h($user->created) ?></td>
                     <td><?= h($user->modified) ?></td>
                     <td class="actions">

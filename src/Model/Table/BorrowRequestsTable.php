@@ -86,6 +86,11 @@ class BorrowRequestsTable extends Table
             ->date('return_date')
             ->allowEmptyDate('return_date');
 
+        // Validate return_time (add if necessary)
+        $validator
+            ->time('return_time', 'Please provide a valid time for Return Time')
+            ->allowEmptyString('return_time');  // Optional, if you want to allow empty time
+
         return $validator;
     }
 

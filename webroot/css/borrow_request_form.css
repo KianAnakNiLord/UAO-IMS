@@ -83,3 +83,35 @@ button[type="submit"]:hover {
 .side-nav-item:hover {
     text-decoration: underline;
 }
+
+/* Custom Time of Return field - make it look like other fields */
+input[type="time"] {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px; /* Adds space between the label and input */
+    margin-bottom: 18px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 15px;
+    transition: border 0.3s ease-in-out;
+    appearance: none; /* Remove browser-specific styling */
+    -webkit-appearance: none; /* For Safari */
+    -moz-appearance: none; /* For Firefox */
+}
+
+/* Add space between the label and the input field */
+label[for="return_time"] {
+    display: block; /* Forces label to be block-level */
+    margin-bottom: 10px; /* Space between the label and the input field */
+}
+
+/* Time of Return field focus */
+input[type="time"]:focus {
+    border-color: #3A53A4;
+    outline: none;
+}
+
+
+
+

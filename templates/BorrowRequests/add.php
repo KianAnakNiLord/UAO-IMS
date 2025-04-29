@@ -41,6 +41,12 @@
                         'empty' => true
                     ]);
 
+                    echo $this->Form->control('return_time', [
+                        'label' => 'Return Time',
+                        'type' => 'time',
+                        'empty' => true
+                    ]);
+                    
                     // ✅ NEW FIELD — Purpose
                     echo $this->Form->control('purpose', [
                         'label' => 'Purpose',

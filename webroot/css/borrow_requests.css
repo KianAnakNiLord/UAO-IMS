@@ -50,22 +50,27 @@ table tr:last-child td {
 /* Buttons */
 .button {
     display: inline-block;
-    padding: 6px 12px;
-    margin: 2px;
+    width: 120px; /* Set fixed width to maintain uniformity */
+    padding: 12px 20px; /* Add more padding for better button height and text alignment */
+    margin: 8px 10px; /* Increased margin for more space between buttons */
     background-color: #3A53A4;
     color: white;
     border: none;
-    border-radius: 5px;
-    font-size: 13px;
+    border-radius: 6px;
+    font-size: 14px;
     cursor: pointer;
     text-decoration: none;
     transition: background 0.3s ease;
+    text-align: center; /* Ensures text is centered inside the button */
+    box-sizing: border-box; /* Ensures padding is included within the button width */
 }
 
+/* Button hover effect */
 .button:hover {
     background-color: #2e418a;
 }
 
+/* Danger button (Reject) style */
 .button.danger {
     background-color: #d9534f;
 }

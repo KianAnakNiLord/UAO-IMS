@@ -41,29 +41,42 @@ class BorrowRequestsController extends AppController
 
     // ✅ Borrower - Submit Request
     public function add()
-    {
-        $borrowRequest = $this->BorrowRequests->newEmptyEntity();
+{
+    $borrowRequest = $this->BorrowRequests->newEmptyEntity();
 
-        if ($this->request->is('post')) {
-            $data = $this->request->getData();
+    if ($this->request->is('post')) {
+        $data = $this->request->getData();
 
-            // Automatically set user_id and status
-            $identity = $this->request->getAttribute('identity');
-            $data['user_id'] = $identity->get('id');
-            $data['status'] = 'pending';
 
-            $borrowRequest = $this->BorrowRequests->patchEntity($borrowRequest, $data);
 
-            if ($this->BorrowRequests->save($borrowRequest)) {
-                $this->Flash->success('Request submitted successfully!');
-                return $this->redirect(['action' => 'index']);
-            }
-            $this->Flash->error('Could not submit request.');
+        // Automatically set user_id and status
+        $identity = $this->request->getAttribute('identity');
+        $data['user_id'] = $identity->get('id');
+        $data['status'] = 'pending';
+
+        // Handle the return_time field - Convert it to the proper format
+        if (!empty($data['return_time'])) {
+            // Convert the time to a valid format (HH:MM:SS)
+            $data['return_time'] = date('H:i:s', strtotime($data['return_time']));
         }
 
-        $inventoryItems = $this->InventoryItems->find('list');
-        $this->set(compact('borrowRequest', 'inventoryItems'));
+        // Patch the entity with the data
+        $borrowRequest = $this->BorrowRequests->patchEntity($borrowRequest, $data);
+
+        // Save the borrow request
+        if ($this->BorrowRequests->save($borrowRequest)) {
+            $this->Flash->success('Request submitted successfully!');
+            return $this->redirect(['action' => 'index']);
+        }
+        $this->Flash->error('Could not submit request.');
     }
+
+    // Fetch inventory items for the form dropdown
+    $inventoryItems = $this->InventoryItems->find('list');
+    $this->set(compact('borrowRequest', 'inventoryItems'));
+}
+
+    
 
     // ✅ Admin - Approve Request
     public function approve($id)
@@ -109,4 +122,14 @@ class BorrowRequestsController extends AppController
         $this->Flash->error('Marked as overdue.');
         return $this->redirect(['action' => 'index']);
     }
+
+
+public function viewReason($id = null)
+{
+    $request = $this->BorrowRequests->get($id, [
+        'contain' => ['Users', 'InventoryItems'],
+    ]);
+
+    $this->set(compact('request'));
+}
 }

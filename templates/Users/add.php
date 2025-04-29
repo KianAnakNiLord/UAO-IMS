@@ -1,5 +1,3 @@
-
-
 <?php
 /**
  * @var \App\View\AppView $this
@@ -33,6 +31,13 @@
                 'label' => 'Expected Return Date',
                 'type' => 'date',
                 'required' => true
+            ]);
+
+            // Add Return Time field here
+            echo $this->Form->control('return_time', [
+                'label' => 'Return Time',
+                'type' => 'time',
+                'empty' => true
             ]);
         ?>
     </fieldset>
