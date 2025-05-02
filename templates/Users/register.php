@@ -7,13 +7,13 @@
 
             <?= $this->Form->control('name', [
                 'label' => 'Full Name',
-                'placeholder' => 'e.g. Juan dela Cruz',
+                'placeholder' => 'e.g. Lebron James',
                 'class' => 'form-control' // ✅ Force consistent styling
             ]) ?>
 
             <?= $this->Form->control('email', [
                 'label' => 'Email Address',
-                'placeholder' => 'e.g. you@xu.edu.ph',
+                'placeholder' => 'e.g. 2xxxxxxxxx@xu.edu.ph',
                 'class' => 'form-control'
             ]) ?>
 

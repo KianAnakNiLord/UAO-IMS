@@ -22,6 +22,7 @@ return function (RouteBuilder $routes): void {
         $builder->connect('/admins/dashboard', ['controller' => 'Admins', 'action' => 'dashboard']);
         $builder->connect('/admins/inventory', ['controller' => 'Admins', 'action' => 'inventory']);
         $builder->connect('/admins/borrow_requests', ['controller' => 'Admins', 'action' => 'borrowRequests']);
+        $builder->connect('/admins/borrow-history', ['controller' => 'Admins', 'action' => 'history']);
 
         // Pages
         $builder->connect('/pages/*', 'Pages::display');

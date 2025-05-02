@@ -44,12 +44,16 @@ class UsersTable extends Table
             ->requirePresence('name', 'create')
             ->notEmptyString('name');
 
-        $validator
-            ->email('email')
+            $validator
+            ->email('email')  // Built-in email validation
             ->requirePresence('email', 'create')
             ->notEmptyString('email')
+            ->add('email', 'validFormat', [
+                'rule' => ['custom', '/^\d{11}@my\.xu\.edu\.ph$/'],
+                'message' => 'Please enter a valid Xavier University email address (e.g. 20220024802@my.xu.edu.ph)'
+            ])
             ->add('email', 'unique', ['rule' => 'validateUnique', 'provider' => 'table']);
-
+            
         $validator
             ->scalar('password')
             ->maxLength('password', 255)
@@ -75,6 +79,6 @@ class UsersTable extends Table
         'id', 'name', 'email', 'password', 'role'
     ]);
 }
-
+    
 
 }

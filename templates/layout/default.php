@@ -1,8 +1,5 @@
+<!-- templates/layout/default.php -->
 <?php
-/**
- * @var \App\View\AppView $this
- * @var \Cake\View\View $this
- */
 $identity = $this->request->getAttribute('identity');
 $role = $identity ? $identity->get('role') : null;
 ?>
@@ -17,7 +14,6 @@ $role = $identity ? $identity->get('role') : null;
     <?= $this->fetch('css') ?>
     <?= $this->fetch('script') ?>
     <?= $this->Html->css('login') ?>
-
 </head>
 <body>
 <div class="layout">
@@ -33,6 +29,8 @@ $role = $identity ? $identity->get('role') : null;
                     <?= $this->Html->link('Dashboard', '/admins/dashboard', ['class' => 'nav-item']) ?>
                     <?= $this->Html->link('Inventory', '/admins/inventory', ['class' => 'nav-item']) ?>
                     <?= $this->Html->link('Borrow Requests', '/admins/borrowRequests', ['class' => 'nav-item']) ?>
+                    <!-- Link for Borrow History -->
+                    <?= $this->Html->link('Borrow History', '/admins/history', ['class' => 'nav-item']) ?>
                 <?php elseif ($role === 'borrower'): ?>
                     <?= $this->Html->link('Dashboard', '/borrowers/dashboard', ['class' => 'nav-item']) ?>
                     <?= $this->Html->link('New Borrow Request', '/borrowRequests/add', ['class' => 'nav-item']) ?>

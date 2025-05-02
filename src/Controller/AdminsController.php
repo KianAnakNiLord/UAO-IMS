@@ -28,87 +28,84 @@ class AdminsController extends AppController
     }
 
     public function inventory()
-{
-    $this->InventoryItems = $this->fetchTable('InventoryItems');
+    {
+        $this->InventoryItems = $this->fetchTable('InventoryItems');
 
-    $query = $this->InventoryItems->find();
+        $query = $this->InventoryItems->find();
 
-    // Filtering
-    $search = $this->request->getQuery('search');
-    $category = $this->request->getQuery('category');
+        // Filtering
+        $search = $this->request->getQuery('search');
+        $category = $this->request->getQuery('category');
 
-    if ($search) {
-        $query->where(function ($exp, $q) use ($search) {
-            return $exp->like('name', '%' . $search . '%');
-        });
-    }
-
-    if ($category) {
-        $query->where(['category' => $category]);
-    }
-
-    $inventoryItems = $this->paginate($query);
-
-    $this->set(compact('inventoryItems', 'search', 'category'));
-}
-
-public function addInventory()
-{
-    $item = $this->fetchTable('InventoryItems')->newEmptyEntity();
-
-    if ($this->request->is('post')) {
-        $item = $this->fetchTable('InventoryItems')->patchEntity($item, $this->request->getData());
-        if ($this->fetchTable('InventoryItems')->save($item)) {
-            $this->Flash->success('Item added.');
-            return $this->redirect(['action' => 'inventory']);
+        if ($search) {
+            $query->where(function ($exp, $q) use ($search) {
+                return $exp->like('name', '%' . $search . '%');
+            });
         }
-        $this->Flash->error('Could not add item.');
-    }
 
-    $this->set(compact('item'));
-}
-
-
-public function editInventory($id = null)
-{
-    $item = $this->fetchTable('InventoryItems')->get($id);
-
-    if ($this->request->is(['post', 'put', 'patch'])) {
-        $item = $this->fetchTable('InventoryItems')->patchEntity($item, $this->request->getData());
-        if ($this->fetchTable('InventoryItems')->save($item)) {
-            $this->Flash->success('Item updated.');
-            return $this->redirect(['action' => 'inventory']);
+        if ($category) {
+            $query->where(['category' => $category]);
         }
-        $this->Flash->error('Could not update item.');
+
+        $inventoryItems = $this->paginate($query);
+
+        $this->set(compact('inventoryItems', 'search', 'category'));
     }
 
-    $this->set(compact('item'));
-}
+    public function addInventory()
+    {
+        $item = $this->fetchTable('InventoryItems')->newEmptyEntity();
 
-public function deleteInventory($id)
-{
-    $this->InventoryItems = $this->fetchTable('InventoryItems');
-    $item = $this->InventoryItems->get($id);
-
-    if ($this->request->is(['post', 'delete'])) {
-        if ($this->InventoryItems->delete($item)) {
-            $this->Flash->success('Item deleted.');
-        } else {
-            $this->Flash->error('Item could not be deleted.');
+        if ($this->request->is('post')) {
+            $item = $this->fetchTable('InventoryItems')->patchEntity($item, $this->request->getData());
+            if ($this->fetchTable('InventoryItems')->save($item)) {
+                $this->Flash->success('Item added.');
+                return $this->redirect(['action' => 'inventory']);
+            }
+            $this->Flash->error('Could not add item.');
         }
+
+        $this->set(compact('item'));
     }
 
-    return $this->redirect(['action' => 'inventory']);
-}
+    public function editInventory($id = null)
+    {
+        $item = $this->fetchTable('InventoryItems')->get($id);
 
+        if ($this->request->is(['post', 'put', 'patch'])) {
+            $item = $this->fetchTable('InventoryItems')->patchEntity($item, $this->request->getData());
+            if ($this->fetchTable('InventoryItems')->save($item)) {
+                $this->Flash->success('Item updated.');
+                return $this->redirect(['action' => 'inventory']);
+            }
+            $this->Flash->error('Could not update item.');
+        }
 
+        $this->set(compact('item'));
+    }
 
+    public function deleteInventory($id)
+    {
+        $this->InventoryItems = $this->fetchTable('InventoryItems');
+        $item = $this->InventoryItems->get($id);
+
+        if ($this->request->is(['post', 'delete'])) {
+            if ($this->InventoryItems->delete($item)) {
+                $this->Flash->success('Item deleted.');
+            } else {
+                $this->Flash->error('Item could not be deleted.');
+            }
+        }
+
+        return $this->redirect(['action' => 'inventory']);
+    }
 
     public function borrowRequests()
     {
         $requests = $this->BorrowRequests
             ->find('all')
             ->contain(['Users', 'InventoryItems'])
+            ->where(['BorrowRequests.status' => 'pending']) // Only show pending borrow requests
             ->order(['BorrowRequests.created' => 'DESC']);
 
         $this->set('borrowRequests', $requests);
@@ -146,7 +143,6 @@ public function deleteInventory($id)
             return $this->redirect(['action' => 'borrowRequests']);
         }
 
-        // Fallback redirect if accessed directly
         return $this->redirect(['action' => 'borrowRequests']);
     }
 
@@ -154,5 +150,44 @@ public function deleteInventory($id)
     {
         $request = $this->BorrowRequests->get($id, ['contain' => ['Users', 'InventoryItems']]);
         $this->set(compact('request'));
+    }
+
+    public function adminDashboard()
+    {
+        $user = $this->request->getAttribute('identity'); // Get the logged-in user
+
+        // Redirect to the login page if the user is not authenticated or not an admin
+        if (!$user || $user->role !== 'admin') {
+            return $this->redirect(['controller' => 'Users', 'action' => 'login']);
+        }
+
+        // Fetch borrow requests or any other data you need for the admin dashboard
+        $borrowRequests = $this->BorrowRequests->find('all')
+            ->contain(['Users', 'InventoryItems'])
+            ->order(['created' => 'DESC']);
+
+        $this->set(compact('borrowRequests'));
+    }
+
+    public function history()
+    {
+        // Get search query from the GET request
+        $search = $this->request->getQuery('email');
+
+        // Build query for finding the borrow requests
+        $query = $this->BorrowRequests->find()
+            ->contain(['Users', 'InventoryItems'])
+            ->where(['BorrowRequests.status IN' => ['approved', 'rejected']]) // Filter by approved and rejected
+            ->order(['BorrowRequests.created' => 'DESC']);
+
+        if ($search) {
+            $query->where(['Users.email LIKE' => '%' . $search . '%']);
+        }
+
+        // Paginate the results
+        $history = $this->paginate($query);
+
+        // Set the data for the view
+        $this->set(compact('history'));
     }
 }

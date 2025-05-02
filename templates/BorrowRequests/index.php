@@ -57,6 +57,7 @@
                     <td><?= h($borrowRequest->created) ?></td>
 
                     <td class="actions">
+                        <!-- Delete Button -->
                         <?= $this->Form->postLink(
                             __('Delete'),
                             ['action' => 'delete', $borrowRequest->id],

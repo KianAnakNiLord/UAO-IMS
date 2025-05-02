@@ -132,4 +132,44 @@ public function viewReason($id = null)
 
     $this->set(compact('request'));
 }
+
+// BorrowRequestsController.php
+
+public function delete($id = null)
+{
+    $this->request->allowMethod(['post', 'delete']);
+    $borrowRequest = $this->BorrowRequests->get($id);
+
+    // Ensure that only the owner of the request can delete it
+    $identity = $this->request->getAttribute('identity');
+    if ($borrowRequest->user_id !== $identity->get('id')) {
+        $this->Flash->error(__('You are not authorized to delete this request.'));
+        return $this->redirect(['action' => 'index']);
+    }
+
+    if ($this->BorrowRequests->delete($borrowRequest)) {
+        $this->Flash->success(__('The borrow request has been deleted.'));
+    } else {
+        $this->Flash->error(__('The borrow request could not be deleted. Please, try again.'));
+    }
+    return $this->redirect(['action' => 'index']);
+}
+
+
+public function dashboard()
+{
+    $user = $this->request->getAttribute('identity'); // Get the logged-in user
+    if (!$user) {
+        // Redirect if the user is not logged in
+        return $this->redirect(['controller' => 'Users', 'action' => 'login']);
+    }
+
+    // Fetch borrow requests for the logged-in user
+    $borrowRequests = $this->BorrowRequests->find('all')
+        ->where(['user_id' => $user->id])
+        ->contain(['InventoryItems'])
+        ->order(['created' => 'DESC']);
+
+    $this->set(compact('borrowRequests'));
+}
 }
