@@ -18,32 +18,36 @@ $role = $identity ? $identity->get('role') : null;
 <body>
 <div class="layout">
     <!-- Sidebar -->
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <h2 style="color: white;">UAO-IMS</h2>
-        </div>
+    <!-- Sidebar -->
+<aside class="sidebar">
+    <div class="sidebar-header">
+        <h2 style="color: white;">UAO-IMS</h2>
+    </div>
 
-        <nav class="nav-links">
-            <?php if ($identity): ?>
-                <?php if ($role === 'admin'): ?>
-                    <?= $this->Html->link('Dashboard', '/admins/dashboard', ['class' => 'nav-item']) ?>
-                    <?= $this->Html->link('Inventory', '/admins/inventory', ['class' => 'nav-item']) ?>
-                    <?= $this->Html->link('Borrow Requests', '/admins/borrowRequests', ['class' => 'nav-item']) ?>
-                    <!-- Link for Borrow History -->
-                    <?= $this->Html->link('Borrow History', '/admins/history', ['class' => 'nav-item']) ?>
-                <?php elseif ($role === 'borrower'): ?>
-                    <?= $this->Html->link('Dashboard', '/borrowers/dashboard', ['class' => 'nav-item']) ?>
-                    <?= $this->Html->link('New Borrow Request', '/borrowRequests/add', ['class' => 'nav-item']) ?>
-                    <?= $this->Html->link('My Requests', '/borrowRequests/index', ['class' => 'nav-item']) ?>
-                <?php endif; ?>
-
-                <?= $this->Html->link('Logout', '/users/logout', ['class' => 'nav-item logout']) ?>
-            <?php else: ?>
-                <?= $this->Html->link('Login', '/users/login', ['class' => 'nav-item']) ?>
-                <?= $this->Html->link('Register', '/users/register', ['class' => 'nav-item']) ?>
+    <nav class="nav-links">
+        <?php if ($identity): ?>
+            <?php if ($role === 'admin'): ?>
+                <?= $this->Html->link('Dashboard', '/admins/dashboard', ['class' => 'nav-item']) ?>
+                <?= $this->Html->link('Inventory', '/admins/inventory', ['class' => 'nav-item']) ?>
+                <?= $this->Html->link('Borrow Requests', '/admins/borrowRequests', ['class' => 'nav-item']) ?>
+                <!-- New Link for Approved Requests -->
+                <?= $this->Html->link('Approved Requests', '/admins/approvedRequests', ['class' => 'nav-item']) ?>
+                <!-- Link for Borrow History -->
+                <?= $this->Html->link('Borrow History', '/admins/history', ['class' => 'nav-item']) ?>
+            <?php elseif ($role === 'borrower'): ?>
+                <?= $this->Html->link('Dashboard', '/borrowers/dashboard', ['class' => 'nav-item']) ?>
+                <?= $this->Html->link('New Borrow Request', '/borrowRequests/add', ['class' => 'nav-item']) ?>
+                <?= $this->Html->link('My Requests', '/borrowRequests/index', ['class' => 'nav-item']) ?>
             <?php endif; ?>
-        </nav>
-    </aside>
+
+            <?= $this->Html->link('Logout', '/users/logout', ['class' => 'nav-item logout']) ?>
+        <?php else: ?>
+            <?= $this->Html->link('Login', '/users/login', ['class' => 'nav-item']) ?>
+            <?= $this->Html->link('Register', '/users/register', ['class' => 'nav-item']) ?>
+        <?php endif; ?>
+    </nav>
+</aside>
+
 
     <!-- Main content -->
     <main class="main-content">

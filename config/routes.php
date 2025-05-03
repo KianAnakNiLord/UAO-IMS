@@ -23,6 +23,8 @@ return function (RouteBuilder $routes): void {
         $builder->connect('/admins/inventory', ['controller' => 'Admins', 'action' => 'inventory']);
         $builder->connect('/admins/borrow_requests', ['controller' => 'Admins', 'action' => 'borrowRequests']);
         $builder->connect('/admins/borrow-history', ['controller' => 'Admins', 'action' => 'history']);
+        $builder->connect('/admins/approved-requests', ['controller' => 'Admins', 'action' => 'approvedRequests']);
+        $builder->connect('/admins/mark-as-returned/:id', ['controller' => 'Admins', 'action' => 'markAsReturned']);
 
         // Pages
         $builder->connect('/pages/*', 'Pages::display');

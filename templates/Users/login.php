@@ -5,14 +5,17 @@
         <?= $this->Form->create() ?>
             <?= $this->Form->control('email', [
                 'label' => 'Email Address',
-                'placeholder' => 'e.g. yourname@xu.edu.ph'
+                'placeholder' => 'e.g. yourname@xu.edu.ph',
+                'class' => 'form-control'
             ]) ?>
 
             <?= $this->Form->control('password', [
                 'label' => 'Password',
-                'placeholder' => 'Enter your password'
+                'placeholder' => 'Enter your password',
+                'class' => 'form-control'
             ]) ?>
 
+            <!-- Ensure the button has the class 'login-btn' -->
             <?= $this->Form->button('Login', ['class' => 'login-btn']) ?>
         <?= $this->Form->end() ?>
     </div>

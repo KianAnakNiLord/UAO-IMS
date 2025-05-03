@@ -1,0 +1,35 @@
+/* ===============================
+   Mark as Returned Page Styles
+   =============================== */
+   h1 {
+    color: #3A53A4;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    font-weight: bold;
+}
+
+select.form-control {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    margin-bottom: 10px;
+}
+
+.btn.submit {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+}
+
+.btn.submit:hover {
+    background-color: #218838;
+}

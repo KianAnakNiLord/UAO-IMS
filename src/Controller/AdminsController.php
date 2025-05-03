@@ -177,7 +177,8 @@ class AdminsController extends AppController
         // Build query for finding the borrow requests
         $query = $this->BorrowRequests->find()
             ->contain(['Users', 'InventoryItems'])
-            ->where(['BorrowRequests.status IN' => ['approved', 'rejected']]) // Filter by approved and rejected
+            ->where(['BorrowRequests.status IN' => ['approved', 'rejected', 'returned']])
+
             ->order(['BorrowRequests.created' => 'DESC']);
 
         if ($search) {
@@ -190,4 +191,57 @@ class AdminsController extends AppController
         // Set the data for the view
         $this->set(compact('history'));
     }
+    public function approvedRequests()
+{
+    $user = $this->request->getAttribute('identity'); // Get the logged-in user
+
+    // Redirect to the login page if the user is not authenticated or not an admin
+    if (!$user || $user->role !== 'admin') {
+        return $this->redirect(['controller' => 'Users', 'action' => 'login']);
+    }
+
+    // Fetch the approved borrow requests and avoid ambiguity by specifying the table for 'created'
+    $approvedRequests = $this->BorrowRequests
+        ->find('all')
+        ->contain(['Users', 'InventoryItems'])
+        ->where(['BorrowRequests.status' => 'approved']) // Filter approved requests
+        ->order(['BorrowRequests.created' => 'DESC']);  // Specify the table for the 'created' column
+
+    $this->set(compact('approvedRequests'));
+}
+
+
+
+public function markAsReturned($id = null)
+{
+    $user = $this->request->getAttribute('identity'); // Get the logged-in user
+
+    // Redirect to the login page if the user is not authenticated or not an admin
+    if (!$user || $user->role !== 'admin') {
+        return $this->redirect(['controller' => 'Users', 'action' => 'login']);
+    }
+
+    // Fetch the borrow request by ID
+    $request = $this->BorrowRequests->get($id);
+
+    if ($this->request->is(['post', 'put'])) {
+        // Get the remark value from the form
+        $data = $this->request->getData();
+        $request->status = 'returned'; // Update the status to 'returned'
+        $request->return_remark = $data['remark']; // Set the remark
+
+        // Save the request and give feedback
+        if ($this->BorrowRequests->save($request)) {
+            $this->Flash->success('Request marked as returned successfully.');
+        } else {
+            $this->Flash->error('Could not mark the request as returned.');
+        }
+
+        return $this->redirect(['action' => 'approvedRequests']);
+    }
+
+    $this->set(compact('request'));
+}
+
+
 }

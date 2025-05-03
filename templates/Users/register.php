@@ -2,13 +2,12 @@
     <div class="register-card">
         <h1 class="register-title">Create an Account</h1>
 
-        <!-- ✅ Fix: start form BEFORE the inputs -->
         <?= $this->Form->create($user) ?>
 
             <?= $this->Form->control('name', [
                 'label' => 'Full Name',
                 'placeholder' => 'e.g. Lebron James',
-                'class' => 'form-control' // ✅ Force consistent styling
+                'class' => 'form-control'
             ]) ?>
 
             <?= $this->Form->control('email', [

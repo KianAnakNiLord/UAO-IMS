@@ -33,13 +33,14 @@
                         <td><?= h($borrowRequest->inventory_item->name) ?></td>
                         <td><?= h($borrowRequest->quantity_requested) ?> pcs</td>
                         
-                        <!-- Status with color coding for approved/rejected -->
+                        <!-- Status with color coding for approved/rejected/returned -->
                         <td>
                             <?php
                                 $status = $borrowRequest->status;
                                 $color = match ($status) {
                                     'approved' => 'green',
                                     'rejected' => 'red',
+                                    'returned' => 'blue', // Color for returned
                                     default => 'black'
                                 };
                             ?>

@@ -1,0 +1,116 @@
+/* ============================
+   Dashboard Styling (dashboardAdmin.css)
+============================= */
+
+/* General Styles */
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f5f7fa;
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    color: #3A53A4;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+h3 {
+    color: #3A53A4;
+    margin-bottom: 20px;
+}
+
+/* Overview Section with Cards */
+.overview {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+}
+
+.overview-card {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 22%;
+    text-align: center;
+}
+
+.overview-card h4 {
+    font-size: 18px;
+    color: #3A53A4;
+    margin-bottom: 10px;
+}
+
+.overview-card p {
+    font-size: 24px;
+    color: #333;
+}
+
+/* Notifications Section */
+.notifications {
+    margin: 20px 0;
+}
+
+.notifications table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.notifications th, .notifications td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.notifications th {
+    background-color: #3A53A4;
+    color: white;
+}
+
+.notifications td {
+    background-color: #fff;
+}
+
+/* Action Buttons */
+.btn {
+    padding: 6px 12px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.approve {
+    background-color: green;
+    color: white;
+}
+
+.reject {
+    background-color: red;
+    color: white;
+}
+
+.btn:hover {
+    opacity: 0.8;
+}
+
+/* Admin Links */
+.admin-links ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.admin-links ul li {
+    margin: 10px 0;
+}
+
+.admin-links a {
+    text-decoration: none;
+    color: #3A53A4;
+    font-weight: bold;
+}
+
+.admin-links a:hover {
+    color: #2c3e94;
+}
