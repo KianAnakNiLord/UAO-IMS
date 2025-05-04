@@ -55,12 +55,14 @@ return function (RouteBuilder $routes): void {
          * its action called 'display', and we pass a param to select the view file
          * to use (in this case, templates/Pages/home.php)...
          */
-        $builder->connect('/', ['controller' => 'Pages', 'action' => 'display', 'home']);
+        $builder->connect('/', ['controller' => 'Login', 'action' => 'index']);
+
 
         /*
          * ...and connect the rest of 'Pages' controller's URLs.
          */
-        $builder->connect('/pages/*', 'Pages::display');
+
+        //$builder->connect('/pages/*', 'Pages::display');
 
         
 
@@ -101,6 +103,22 @@ return function (RouteBuilder $routes): void {
         // Route /admin to DashboardController
         $builder->connect('/', ['controller' => 'Dashboard', 'action' => 'index']);
     
+        $builder->fallbacks(DashedRoute::class);
+    });
+
+    $routes->prefix('Admin', function (RouteBuilder $builder) {
+        $builder->connect('/borrowed', ['controller' => 'Dashboard', 'action' => 'borrowed']);
+        $builder->fallbacks(DashedRoute::class);
+    });
+
+    $routes->connect('/register', ['controller' => 'Register', 'action' => 'index']);
+
+    $routes->connect('/home', ['controller' => 'Pages', 'action' => 'home']);
+
+    $routes->connect('/', ['controller' => 'Dashboard', 'action' => 'index']);
+
+    $routes->prefix('Admin', function (RouteBuilder $builder) {
+        $builder->connect('/items-status', ['controller' => 'Dashboard', 'action' => 'itemsStatus']);
         $builder->fallbacks(DashedRoute::class);
     });
 };

@@ -35,7 +35,10 @@ class BorrowingsController extends AppController
      */
     public function index()
     {
-        $query = $this->Borrowings->find()->contain(['Borrowers', 'Items']); // ✅ Include Borrowers & Items
+        $userId = $this->request->getSession()->read('Auth.id'); // Get the logged-in user's ID
+        $query = $this->Borrowings->find()
+            ->where(['borrower_id' => $userId, 'status' => 'pending']) // Filter by user and pending status
+            ->contain(['Items']); // Include item details
     
         $borrowings = $this->paginate($query);
         $this->set(compact('borrowings'));
@@ -57,32 +60,34 @@ class BorrowingsController extends AppController
      * Add method - Records a new borrowing transaction
      */
     public function add()
-    {
-        $borrowing = $this->Borrowings->newEmptyEntity();
-    
-        if ($this->request->is('post')) {
-            $borrowing = $this->Borrowings->patchEntity($borrowing, $this->request->getData());
-    
-            // Set approval status to pending
-            $borrowing->approval_status = 'pending';
-    
-            // Optional: set borrowed status too
-            $borrowing->status = 'waiting'; // or leave null if not needed yet
-    
-            if ($this->Borrowings->save($borrowing)) {
-                $this->Flash->success(__('Your borrow request has been sent for approval.'));
-                return $this->redirect(['action' => 'index']);
-            }
-    
-            $this->Flash->error(__('The borrow request could not be submitted. Please, try again.'));
-        }
-    
-        $borrowers = $this->Borrowings->Borrowers->find('list');
-        $items = $this->Borrowings->Items->find('list');
-    
-        $this->set(compact('borrowing', 'borrowers', 'items'));
-    }
+{
+    $borrowing = $this->Borrowings->newEmptyEntity();
+    if ($this->request->is('post')) {
+        $data = $this->request->getData();
 
+        // Handle file upload
+        $file = $data['attachment'];
+        if ($file && $file->getError() === UPLOAD_ERR_OK) {
+            $filename = time() . '_' . $file->getClientFilename();
+            $file->moveTo(WWW_ROOT . 'files' . DS . 'attachments' . DS . $filename);
+            $data['attachment'] = $filename;
+        } else {
+            $data['attachment'] = null;
+        }
+
+        $borrowing = $this->Borrowings->patchEntity($borrowing, $data);
+        $borrowing->borrower_id = $this->request->getSession()->read('Auth.id'); // Assign logged-in user as borrower
+        $borrowing->status = 'pending'; // Set status to pending
+
+        if ($this->Borrowings->save($borrowing)) {
+            $this->Flash->success(__('Your borrow request has been sent for approval.'));
+            return $this->redirect(['action' => 'index']);
+        }
+        $this->Flash->error(__('The borrow request could not be submitted. Please, try again.'));
+    }
+    $items = $this->Borrowings->Items->find('list');
+    $this->set(compact('borrowing', 'items'));
+}
     public function addborrower()
 {
     $borrower = $this->Borrowings->Borrowers->newEmptyEntity();
@@ -135,32 +140,4 @@ class BorrowingsController extends AppController
         }
         return $this->redirect(['action' => 'index']);
     }
-
-    public function approve($id)
-{
-    $borrowing = $this->Borrowings->get($id);
-    $borrowing->status = 'approved';
-
-    if ($this->Borrowings->save($borrowing)) {
-        $this->Flash->success(__('Borrow request approved.'));
-    } else {
-        $this->Flash->error(__('Unable to approve the request.'));
-    }
-
-    return $this->redirect(['action' => 'index']);
-}
-
-public function reject($id)
-{
-    $borrowing = $this->Borrowings->get($id);
-    $borrowing->status = 'rejected';
-
-    if ($this->Borrowings->save($borrowing)) {
-        $this->Flash->success(__('Borrow request rejected.'));
-    } else {
-        $this->Flash->error(__('Unable to reject the request.'));
-    }
-
-    return $this->redirect(['action' => 'index']);
-}
 }

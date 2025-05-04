@@ -87,4 +87,19 @@ class PagesController extends AppController
             throw new NotFoundException();
         }
     }
+
+    public function beforeFilter(\Cake\Event\EventInterface $event): void
+    {
+        parent::beforeFilter($event);
+    
+        // Allow only the login page to be accessed without authentication
+        $allowedActions = ['display'];
+        if (!in_array($this->request->getParam('action'), $allowedActions)) {
+            $user = $this->request->getSession()->read('Auth');
+            if (!$user) {
+                $this->Flash->error('You must log in to access this page.');
+                $this->redirect(['controller' => 'Login', 'action' => 'index']);
+            }
+        }
+    }
 }

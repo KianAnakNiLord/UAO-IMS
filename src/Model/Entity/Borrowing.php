@@ -29,13 +29,15 @@ class Borrowing extends Entity
      *
      * @var array<string, bool>
      */
-    protected array $_accessible = [
+
+     protected array $_accessible = [
         'borrower_id' => true,
         'item_id' => true,
+        'quantity' => true,
         'borrowed_date' => true,
-        'due_date' => true,
-        'returned_date' => true,
+        'return_date' => true,
         'status' => true,
+        'attachment' => true,
         'created' => true,
         'modified' => true,
     ];

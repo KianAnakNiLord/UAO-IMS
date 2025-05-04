@@ -60,6 +60,10 @@ class ItemsTable extends Table
             ->notEmptyString('quantity', 'Quantity is required') // Cannot be empty
             ->greaterThanOrEqual('quantity', 0, 'Quantity must be a positive number'); // Prevent negative values
 
+         $validator
+            ->integer('quantity')
+            ->greaterThanOrEqual('quantity', 0, 'Quantity cannot be negative.');
+
         return $validator;
     }
 }

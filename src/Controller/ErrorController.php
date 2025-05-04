@@ -1,57 +1,39 @@
 <?php
 declare(strict_types=1);
 
-/**
- * CakePHP(tm) : Rapid Development Framework (https://cakephp.org)
- * Copyright (c) Cake Software Foundation, Inc. (https://cakefoundation.org)
- *
- * Licensed under The MIT License
- * For full copyright and license information, please see the LICENSE.txt
- * Redistributions of files must retain the above copyright notice.
- *
- * @copyright     Copyright (c) Cake Software Foundation, Inc. (https://cakefoundation.org)
- * @link          https://cakephp.org CakePHP(tm) Project
- * @since         3.3.4
- * @license       https://opensource.org/licenses/mit-license.php MIT License
- */
 namespace App\Controller;
 
 use Cake\Event\EventInterface;
 
-/**
- * Error Handling Controller
- *
- * Controller used by ExceptionRenderer to render error responses.
- */
 class ErrorController extends AppController
 {
     /**
-     * Initialization hook method.
-     *
-     * @return void
-     */
-    public function initialize(): void
-    {
-        // Only add parent::initialize() if you are confident your appcontroller is safe.
-    }
-
-    /**
      * beforeFilter callback.
      *
-     * @param \Cake\Event\EventInterface<\Cake\Controller\Controller> $event Event.
-     * @return \Cake\Http\Response|null|void
+     * @param \Cake\Event\EventInterface $event Event.
+     * @return void
      */
-    public function beforeFilter(EventInterface $event)
+    public function beforeFilter(EventInterface $event): void
     {
+        parent::beforeFilter($event);
+
+        // Disable authentication for error pages
+        $this->Authentication->allowUnauthenticated(['*']);
+
+        // Set a layout specifically for error pages, if needed
+        $this->viewBuilder()->setLayout('error');
+
+        // Additional logic: Set a default title for error pages
+        $this->set('title', 'Error');
     }
 
     /**
      * beforeRender callback.
      *
-     * @param \Cake\Event\EventInterface<\Cake\Controller\Controller> $event Event.
-     * @return \Cake\Http\Response|null|void
+     * @param \Cake\Event\EventInterface $event Event.
+     * @return void
      */
-    public function beforeRender(EventInterface $event)
+    public function beforeRender(EventInterface $event): void
     {
         parent::beforeRender($event);
 
@@ -61,10 +43,11 @@ class ErrorController extends AppController
     /**
      * afterFilter callback.
      *
-     * @param \Cake\Event\EventInterface<\Cake\Controller\Controller> $event Event.
-     * @return \Cake\Http\Response|null|void
+     * @param \Cake\Event\EventInterface $event Event.
+     * @return void
      */
-    public function afterFilter(EventInterface $event)
+    public function afterFilter(EventInterface $event): void
     {
+        parent::afterFilter($event);
     }
 }
