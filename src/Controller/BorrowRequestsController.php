@@ -40,41 +40,63 @@ class BorrowRequestsController extends AppController
 }
 
     // ✅ Borrower - Submit Request
+    // ✅ Borrower - Submit Request
     public function add()
-{
-    $borrowRequest = $this->BorrowRequests->newEmptyEntity();
-
-    if ($this->request->is('post')) {
-        $data = $this->request->getData();
-
-
-
-        // Automatically set user_id and status
-        $identity = $this->request->getAttribute('identity');
-        $data['user_id'] = $identity->get('id');
-        $data['status'] = 'pending';
-
-        // Handle the return_time field - Convert it to the proper format
-        if (!empty($data['return_time'])) {
-            // Convert the time to a valid format (HH:MM:SS)
-            $data['return_time'] = date('H:i:s', strtotime($data['return_time']));
+    {
+        $borrowRequest = $this->BorrowRequests->newEmptyEntity();
+    
+        if ($this->request->is('post')) {
+            $data = $this->request->getData();
+    
+            // Automatically set user_id and status
+            $identity = $this->request->getAttribute('identity');
+            $data['user_id'] = $identity->get('id');
+            $data['status'] = 'pending';
+    
+            // Convert return_time to proper format
+            if (!empty($data['return_time'])) {
+                $data['return_time'] = date('H:i:s', strtotime($data['return_time']));
+            }
+    
+            // ✅ Handle ID image upload with file type and size validation
+            $file = $this->request->getData('id_image');
+            if ($file instanceof \Laminas\Diactoros\UploadedFile && $file->getError() === 0) {
+                $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+                $maxSize = 2 * 1024 * 1024; // 2 MB
+    
+                if (!in_array($file->getClientMediaType(), $allowedTypes)) {
+                    $this->Flash->error('Only JPG, PNG, and GIF files are allowed.');
+                    return $this->redirect(['action' => 'add']);
+                }
+    
+                if ($file->getSize() > $maxSize) {
+                    $this->Flash->error('The image must be less than 2MB.');
+                    return $this->redirect(['action' => 'add']);
+                }
+    
+                $filename = time() . '_' . $file->getClientFilename();
+                $file->moveTo(WWW_ROOT . 'uploads' . DS . $filename);
+                $data['id_image'] = 'uploads/' . $filename;
+            } else {
+                $data['id_image'] = null;
+            }
+    
+            // Patch and save the request
+            $borrowRequest = $this->BorrowRequests->patchEntity($borrowRequest, $data);
+    
+            if ($this->BorrowRequests->save($borrowRequest)) {
+                $this->Flash->success('Request submitted successfully!');
+                return $this->redirect(['action' => 'index']);
+            }
+    
+            $this->Flash->error('Could not submit request.');
         }
-
-        // Patch the entity with the data
-        $borrowRequest = $this->BorrowRequests->patchEntity($borrowRequest, $data);
-
-        // Save the borrow request
-        if ($this->BorrowRequests->save($borrowRequest)) {
-            $this->Flash->success('Request submitted successfully!');
-            return $this->redirect(['action' => 'index']);
-        }
-        $this->Flash->error('Could not submit request.');
+    
+        // Fetch inventory items for the form dropdown
+        $inventoryItems = $this->InventoryItems->find('list');
+        $this->set(compact('borrowRequest', 'inventoryItems'));
     }
-
-    // Fetch inventory items for the form dropdown
-    $inventoryItems = $this->InventoryItems->find('list');
-    $this->set(compact('borrowRequest', 'inventoryItems'));
-}
+    
 
     
 

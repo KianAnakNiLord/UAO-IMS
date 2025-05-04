@@ -15,7 +15,8 @@
     </aside>
     <div class="column column-80">
         <div class="borrowRequests form content">
-            <?= $this->Form->create($borrowRequest) ?>
+        <?= $this->Form->create($borrowRequest, ['type' => 'file']) ?>
+
             <fieldset>
                 <legend><?= __('Submit Borrow Request') ?></legend>
                 <?php
@@ -53,6 +54,14 @@
                         'type' => 'textarea',
                         'placeholder' => 'State the reason for borrowing...'
                     ]);
+
+                    echo $this->Form->control('id_image', [
+                        'type' => 'file',
+                        'label' => 'Upload Student/Employee ID',
+                        'accept' => 'image/*'
+                    ]);
+                    
+                    
                 ?>
             </fieldset>
             <?= $this->Form->button(__('Submit')) ?>

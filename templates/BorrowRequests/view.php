@@ -51,6 +51,15 @@
                     <td><?= h($borrowRequest->modified) ?></td>
                 </tr>
             </table>
+
+            <?php if (!empty($borrowRequest->id_image)): ?>
+                <div style="margin-top: 20px;">
+                    <strong>ID Image:</strong><br>
+                    <img src="/uploads/<?= h($borrowRequest->id_image) ?>" width="150" alt="Submitted ID">
+                </div>
+            <?php else: ?>
+                <p><em>No ID image submitted.</em></p>
+            <?php endif; ?>
         </div>
     </div>
 </div>

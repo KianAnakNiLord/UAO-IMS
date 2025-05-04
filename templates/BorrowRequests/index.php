@@ -18,16 +18,15 @@
                     <th><?= __('Status') ?></th>
                     <th><?= __('Request Date') ?></th>
                     <th><?= __('Return Date') ?></th>
-                    <th><?= __('Return Time') ?></th> <!-- Added Return Time column -->
+                    <th><?= __('Return Time') ?></th>
                     <th><?= __('Created') ?></th>
-
+                    <th><?= __('ID Image') ?></th> <!-- ✅ New Column -->
                     <th class="actions"><?= __('Actions') ?></th>
                 </tr>
             </thead>
             <tbody>
                 <?php foreach ($borrowRequests as $borrowRequest): ?>
                 <tr>
-                    <!-- Display Inventory Item as plain text -->
                     <td><?= h($borrowRequest->inventory_item->name) ?></td>
                     <td><?= h($borrowRequest->quantity_requested) ?> pcs</td>
                     <td>
@@ -52,12 +51,33 @@
                     </td>
                     <td><?= h($borrowRequest->request_date) ?></td>
                     <td><?= h($borrowRequest->return_date) ?></td>
-                    <!-- Display Return Time -->
-                    <td><?= h($borrowRequest->return_time ?? 'N/A') ?></td> <!-- Fallback to N/A if return_time is empty -->
+                    <td><?= h($borrowRequest->return_time ?? 'N/A') ?></td>
                     <td><?= h($borrowRequest->created) ?></td>
 
+                    <!-- ✅ Proper Image Display -->
+                    <td>
+<?php
+    $user = $this->request->getAttribute('identity');
+    $isAdmin = $user && $user->get('role') === 'admin';
+    $isOwner = $user && $user->get('id') === $borrowRequest->user_id;
+?>
+
+<?php if (!empty($borrowRequest->id_image) && ($isAdmin || $isOwner)): ?>
+    <?php
+        $idImagePath = ltrim($borrowRequest->id_image, '/\\');
+    ?>
+    <a href="<?= $this->Url->build('/' . $idImagePath) ?>" target="_blank">
+        <img src="<?= $this->Url->build('/' . $idImagePath) ?>" width="60" alt="ID Image" onerror="this.style.display='none'">
+    </a>
+<?php elseif (!$isAdmin && !$isOwner): ?>
+    <em>Private</em>
+<?php else: ?>
+    <em>No ID</em>
+<?php endif; ?>
+</td>
+
+
                     <td class="actions">
-                        <!-- Delete Button -->
                         <?= $this->Form->postLink(
                             __('Delete'),
                             ['action' => 'delete', $borrowRequest->id],
