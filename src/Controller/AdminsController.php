@@ -85,21 +85,35 @@ class AdminsController extends AppController
     }
 
     public function deleteInventory($id)
-    {
-        $this->InventoryItems = $this->fetchTable('InventoryItems');
-        $item = $this->InventoryItems->get($id);
+{
+    $this->InventoryItems = $this->fetchTable('InventoryItems');
+    $this->BorrowRequests = $this->fetchTable('BorrowRequests');
 
+    $item = $this->InventoryItems->get($id);
+
+    // Check if there are any linked borrow requests with pending or approved status
+    $linkedRequests = $this->BorrowRequests
+        ->find()
+        ->where([
+            'inventory_item_id' => $id,
+            'status IN' => ['pending', 'approved']
+        ])
+        ->count();
+
+    if ($linkedRequests > 0) {
+        $this->Flash->error('Cannot delete item. It is currently borrowed or pending approval.');
+    } else {
         if ($this->request->is(['post', 'delete'])) {
             if ($this->InventoryItems->delete($item)) {
                 $this->Flash->success('Item deleted.');
             } else {
-                $this->Flash->error('Item could not be deleted.');
+                $this->Flash->error('Item could not be deleted due to database rules.');
             }
         }
-
-        return $this->redirect(['action' => 'inventory']);
     }
 
+    return $this->redirect(['action' => 'inventory']);
+}
     public function borrowRequests()
     {
         $requests = $this->BorrowRequests
@@ -112,18 +126,23 @@ class AdminsController extends AppController
     }
 
     public function approveRequest($id = null)
-    {
-        $request = $this->BorrowRequests->get($id);
-        $request->status = 'approved';
+{
+    $request = $this->BorrowRequests->get($id, ['contain' => ['InventoryItems']]);
+    $request->status = 'approved';
 
-        if ($this->BorrowRequests->save($request)) {
-            $this->Flash->success('Request approved successfully.');
-        } else {
-            $this->Flash->error('Could not approve request.');
-        }
+    // Deduct quantity
+    $item = $request->inventory_item;
+    $item->quantity -= $request->quantity_requested;
 
-        return $this->redirect(['action' => 'borrowRequests']);
+    if ($this->BorrowRequests->save($request) && $this->fetchTable('InventoryItems')->save($item)) {
+        $this->Flash->success('Request approved successfully and inventory updated.');
+    } else {
+        $this->Flash->error('Could not approve request or update inventory.');
     }
+
+    return $this->redirect(['action' => 'borrowRequests']);
+}
+
 
     public function rejectRequest($id = null)
     {
@@ -214,27 +233,33 @@ class AdminsController extends AppController
 
 public function markAsReturned($id = null)
 {
-    $user = $this->request->getAttribute('identity'); // Get the logged-in user
+    $user = $this->request->getAttribute('identity');
 
-    // Redirect to the login page if the user is not authenticated or not an admin
     if (!$user || $user->role !== 'admin') {
         return $this->redirect(['controller' => 'Users', 'action' => 'login']);
     }
 
-    // Fetch the borrow request by ID
+    // Get the borrow request
     $request = $this->BorrowRequests->get($id);
 
     if ($this->request->is(['post', 'put'])) {
-        // Get the remark value from the form
         $data = $this->request->getData();
-        $request->status = 'returned'; // Update the status to 'returned'
-        $request->return_remark = $data['remark']; // Set the remark
+        $request->status = 'returned';
+        $request->return_remark = $data['remark'];
 
-        // Save the request and give feedback
-        if ($this->BorrowRequests->save($request)) {
-            $this->Flash->success('Request marked as returned successfully.');
+        // ✅ Load inventory item directly and update
+        $inventoryTable = $this->fetchTable('InventoryItems');
+        $item = $inventoryTable->get($request->inventory_item_id);
+        $item->quantity += $request->quantity_requested;
+        $item->setDirty('quantity', true); // Force update
+
+        if (
+            $this->BorrowRequests->save($request) &&
+            $inventoryTable->save($item)
+        ) {
+            $this->Flash->success('Request marked as returned and inventory updated.');
         } else {
-            $this->Flash->error('Could not mark the request as returned.');
+            $this->Flash->error('Could not mark as returned or update inventory.');
         }
 
         return $this->redirect(['action' => 'approvedRequests']);
@@ -242,6 +267,7 @@ public function markAsReturned($id = null)
 
     $this->set(compact('request'));
 }
+
 
 
 }

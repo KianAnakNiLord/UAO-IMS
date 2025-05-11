@@ -92,4 +92,16 @@ class InventoryItemsTable extends Table
 
     return $validator;
 }
+public function buildRules(RulesChecker $rules): RulesChecker
+{
+    $rules->addDelete(function ($entity, $options) {
+        return $this->BorrowRequests->find()->where(['inventory_item_id' => $entity->id])->count() === 0;
+    }, 'noBorrowRecords', [
+        'errorField' => 'id',
+        'message' => 'Cannot delete item in use.'
+    ]);
+
+    return $rules;
+}
+
 }

@@ -3,13 +3,21 @@
 <h2>Borrow History</h2>
 
 <!-- Search Form -->
+<!-- Search Form -->
 <div class="history-search">
     <?= $this->Form->create(null, ['type' => 'get']) ?>
-    <label for="email">Search by Email:</label>
-    <?= $this->Form->control('email', ['type' => 'text', 'placeholder' => 'Enter email to search']) ?>
-    <?= $this->Form->button('Search') ?>
+        <div class="input">
+            <?= $this->Form->label('email', 'Email') ?>
+            <?= $this->Form->control('email', [
+                'type' => 'text',
+                'label' => false,
+                'placeholder' => 'Enter email to search'
+            ]) ?>
+        </div>
+        <?= $this->Form->button('Search') ?>
     <?= $this->Form->end() ?>
 </div>
+
 
 <!-- Display History Table -->
 <div class="history-wrapper">

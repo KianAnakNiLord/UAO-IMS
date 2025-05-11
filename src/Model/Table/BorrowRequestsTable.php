@@ -70,9 +70,10 @@ class BorrowRequestsTable extends Table
             ->integer('user_id')
             ->notEmptyString('user_id');
 
-        $validator
+            $validator
             ->integer('inventory_item_id')
-            ->notEmptyString('inventory_item_id');
+            ->allowEmptyString('inventory_item_id'); // ✅ allow null if deleted
+        
 
         $validator
             ->scalar('status')
@@ -102,10 +103,21 @@ class BorrowRequestsTable extends Table
      * @return \Cake\ORM\RulesChecker
      */
     public function buildRules(RulesChecker $rules): RulesChecker
-    {
-        $rules->add($rules->existsIn(['user_id'], 'Users'), ['errorField' => 'user_id']);
-        $rules->add($rules->existsIn(['inventory_item_id'], 'InventoryItems'), ['errorField' => 'inventory_item_id']);
+{
+    $rules->add($rules->existsIn(['user_id'], 'Users'), ['errorField' => 'user_id']);
+    $rules->add($rules->existsIn(['inventory_item_id'], 'InventoryItems'), ['errorField' => 'inventory_item_id']);
 
-        return $rules;
-    }
+    // ✅ Step 2: Ensure requested quantity does not exceed available inventory
+    $rules->add(function ($entity, $options) {
+        $inventoryTable = $this->getAssociation('InventoryItems')->getTarget();
+        $item = $inventoryTable->get($entity->inventory_item_id);
+        return $entity->quantity_requested <= $item->quantity;
+    }, 'enoughQuantity', [
+        'errorField' => 'quantity_requested',
+        'message' => 'Requested quantity exceeds available inventory.'
+    ]);
+
+    return $rules;
+}
+
 }

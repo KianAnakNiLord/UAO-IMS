@@ -16,8 +16,6 @@
                 '' => 'All',
                 'Equipment' => 'Equipment',
                 'Supply' => 'Supply',
-                'Basketball' => 'Basketball',
-                'Volleyball' => 'Volleyball',
                 'Strength & Conditioning' => 'Strength & Conditioning',
             ],
             'default' => $this->request->getQuery('category')

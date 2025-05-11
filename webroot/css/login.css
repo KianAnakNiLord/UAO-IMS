@@ -169,3 +169,23 @@ input[name="name"] {
 .form-footer a:hover {
     color: #2c3e94;
 }
+
+/* 👁️ Show/Hide Password Eye Icon */
+.password-wrapper {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.password-wrapper input.form-control {
+    padding-right: 16px !important; /* Make space for the icon */
+}
+
+.toggle-password {
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+
+
