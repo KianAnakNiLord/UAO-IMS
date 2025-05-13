@@ -34,7 +34,6 @@
                 'equipment' => 'Equipment',
                 'supply' => 'Supply',
                 'strength' => 'Strength & Conditioning',
-                'ball_sports' => 'Ball Sports'
             ],
             'empty' => 'Choose category'
         ]) ?>

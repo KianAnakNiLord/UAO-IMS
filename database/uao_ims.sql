@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 19, 2025 at 07:02 AM
+-- Generation Time: May 13, 2025 at 10:55 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -30,7 +30,7 @@ SET time_zone = "+00:00";
 CREATE TABLE `borrow_requests` (
   `id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
-  `inventory_item_id` int(11) NOT NULL,
+  `inventory_item_id` int(10) UNSIGNED DEFAULT NULL,
   `status` enum('pending','approved','rejected','returned','overdue') DEFAULT 'pending',
   `request_date` date DEFAULT NULL,
   `return_date` date DEFAULT NULL,
@@ -39,16 +39,10 @@ CREATE TABLE `borrow_requests` (
   `quantity` int(11) DEFAULT 1,
   `quantity_requested` int(11) DEFAULT NULL,
   `purpose` text DEFAULT NULL,
-  `rejection_reason` text DEFAULT NULL
+  `rejection_reason` text DEFAULT NULL,
+  `return_time` time DEFAULT NULL,
+  `id_image` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `borrow_requests`
---
-
-INSERT INTO `borrow_requests` (`id`, `user_id`, `inventory_item_id`, `status`, `request_date`, `return_date`, `created`, `modified`, `quantity`, `quantity_requested`, `purpose`, `rejection_reason`) VALUES
-(1, 13, 3, 'approved', '2025-04-19', '2025-04-19', '2025-04-18 15:52:00', '2025-04-18 15:53:50', 1, NULL, NULL, NULL),
-(2, 13, 4, 'pending', '2025-04-19', '2025-04-19', '2025-04-18 18:35:11', '2025-04-18 18:35:11', 1, 1, 'Varsity Training', NULL);
 
 -- --------------------------------------------------------
 
@@ -57,7 +51,7 @@ INSERT INTO `borrow_requests` (`id`, `user_id`, `inventory_item_id`, `status`, `
 --
 
 CREATE TABLE `inventory_items` (
-  `id` int(11) NOT NULL,
+  `id` int(10) UNSIGNED NOT NULL,
   `name` varchar(100) NOT NULL,
   `procurement_date` date DEFAULT NULL,
   `category` varchar(100) DEFAULT NULL,
@@ -73,10 +67,7 @@ CREATE TABLE `inventory_items` (
 --
 
 INSERT INTO `inventory_items` (`id`, `name`, `procurement_date`, `category`, `item_condition`, `description`, `quantity`, `created`, `modified`) VALUES
-(3, 'Basketball Ring', NULL, NULL, NULL, 's', 2, '2025-04-18 15:33:25', '2025-04-18 15:33:25'),
-(4, 'Volleyball net', '2025-04-18', 'supply', 'used', 'ad', 2, '2025-04-18 15:44:38', '2025-04-18 15:44:38'),
-(5, 'Basketball Ring', '2025-04-18', 'ball_sports', 'new', 'dad', 2, '2025-04-18 15:44:57', '2025-04-18 15:44:57'),
-(6, 'Ezra', '2025-04-17', 'strength', 'new', 'fsdf', 2, '2025-04-18 15:45:34', '2025-04-18 15:45:34');
+(8, 'Soccer Ball', '2025-05-14', 'equipment', 'new', 'Adidas Brand', 5, '2025-05-13 20:49:51', '2025-05-13 20:49:51');
 
 -- --------------------------------------------------------
 
@@ -100,19 +91,12 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`id`, `role`, `name`, `email`, `password`, `created`, `modified`) VALUES
 (1, 'admin', 'Admin User', 'admin@example.com', '', '2025-04-18 18:29:19', '2025-04-18 18:29:19'),
-(2, 'borrower', 'Student 1', 'student1@example.com', '', '2025-04-18 18:29:19', '2025-04-18 18:29:19'),
-(3, 'borrower', 'Charles Babia', 'charles@my.xu.edu.ph', 'lebron', '2025-04-18 10:47:40', '2025-04-18 10:47:40'),
-(4, 'borrower', 'Kian Porras', 'kian@gmail.com', 'kian', '2025-04-18 10:48:12', '2025-04-18 10:48:12'),
-(5, 'borrower', 'Jericho', 'jericho@gmail.com', '$2y$10$itt4dduxCD4HMkt2bSuB/e2ZXKukZxdvJmSkYmyfkNEPTNf1RwsyC', '2025-04-18 10:51:21', '2025-04-18 10:51:21'),
-(6, 'borrower', 'Ezra', 'test@gmail.com', '$2y$10$ZT54hWckosS1KklA8OnS9ew0St.FfLxx3BqKFWOiWMjl6DG0J6Fuy', '2025-04-18 10:52:38', '2025-04-18 10:52:38'),
-(7, 'borrower', 'kiangwapo', 'kiangwapo@gmail.com', '$2y$10$6h9bcriOwXnyOKa.XHyVNuDvcS96KdbboMK2/6WEgjeuxHm0vuFme', '2025-04-18 10:57:33', '2025-04-18 10:57:33'),
-(8, 'borrower', 'Gwapo', 'gwapo@gmail.com', '$2y$10$XufxOdmogOpin7zvsZ/7betYkSQOmjSder3Rv1PrX09oFWs3wto.6', '2025-04-18 11:00:46', '2025-04-18 11:00:46'),
-(9, 'borrower', 'try', 'try@gmail.com', '$2y$10$tKtMljMFJ8p2EKRTR3ifVOLCbebqyGGz9Ocbg/v92j9KEkxWvoOuS', '2025-04-18 11:07:12', '2025-04-18 11:07:12'),
-(10, 'borrower', 'ChatGpt', 'gpt@gmail.com', '$2y$10$NdHKQxQJwcMwKciQb8KbCuyTsPOp19nWd5mpI5RlPpGD7TxmDyBeq', '2025-04-18 11:08:38', '2025-04-18 11:08:38'),
-(11, 'borrower', 'Good', 'good@gmail.com', '$2y$10$pq5JQDHRigrBS/yld8.YE.SxjCfKoKbNEiJijNnMcB2920ZdcQLsq', '2025-04-18 11:27:03', '2025-04-18 11:27:03'),
 (13, 'borrower', 'Charlie Brown', 'brown@gmail.com', '$2y$10$/aPHv2GoG4uaZkVhW1vX8Optvq0WUKSPMK.dxnVfqRvy.fuVWfW/K', '2025-04-18 11:44:23', '2025-04-18 11:44:23'),
 (14, 'borrower', 'practice', 'prac@gmail.com', '$2y$10$ZQZZGGsFDe9/K7/zOHXf8uhV5jPRfXl1oB4lfcXZJgbYt6oLK3P5e', '2025-04-18 12:04:52', '2025-04-18 12:04:52'),
-(16, 'admin', 'Admin User', 'kianadmin@gmail.com', '$2y$10$mVutmVd9PH5sU5vSUcYYBOkWQCxbaeBKHje5dp7N3KYLeUPKluoIu', '2025-04-18 22:06:21', '2025-04-18 22:06:21');
+(16, 'admin', 'Admin User', 'kianadmin@gmail.com', '$2y$10$mVutmVd9PH5sU5vSUcYYBOkWQCxbaeBKHje5dp7N3KYLeUPKluoIu', '2025-04-18 22:06:21', '2025-04-18 22:06:21'),
+(18, 'borrower', 'Lebron', 'lebron@gmail.com', '$2y$10$mrNlnqW6rRrraarjjm86o.r7eaZiDNg0sW.MhzEIPUM.ieMk5cirC', '2025-04-30 09:21:58', '2025-04-30 09:21:58'),
+(20, 'borrower', 'Brown King', 'browney@gmail.com', '$2y$10$2sWLFjSdbCnkZWfHeBhtUuQ8LczML9mqxj0Z305X5MuQh/vfUazSC', '2025-05-02 16:36:54', '2025-05-02 16:36:54'),
+(21, 'borrower', 'Blackey', '20220024809@my.xu.edu.ph', '$2y$10$mawxiDCVTrTX/X6di4MvA.XOMOv73KVo7waUzDcz.NRTzC6mma/Bq', '2025-05-02 16:39:40', '2025-05-02 16:39:40');
 
 --
 -- Indexes for dumped tables
@@ -124,7 +108,7 @@ INSERT INTO `users` (`id`, `role`, `name`, `email`, `password`, `created`, `modi
 ALTER TABLE `borrow_requests`
   ADD PRIMARY KEY (`id`),
   ADD KEY `user_id` (`user_id`),
-  ADD KEY `inventory_item_id` (`inventory_item_id`);
+  ADD KEY `fk_inventory_item` (`inventory_item_id`);
 
 --
 -- Indexes for table `inventory_items`
@@ -147,19 +131,19 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `borrow_requests`
 --
 ALTER TABLE `borrow_requests`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT for table `inventory_items`
 --
 ALTER TABLE `inventory_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- Constraints for dumped tables
@@ -170,7 +154,7 @@ ALTER TABLE `users`
 --
 ALTER TABLE `borrow_requests`
   ADD CONSTRAINT `borrow_requests_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
-  ADD CONSTRAINT `borrow_requests_ibfk_2` FOREIGN KEY (`inventory_item_id`) REFERENCES `inventory_items` (`id`);
+  ADD CONSTRAINT `fk_inventory_item` FOREIGN KEY (`inventory_item_id`) REFERENCES `inventory_items` (`id`) ON DELETE SET NULL;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

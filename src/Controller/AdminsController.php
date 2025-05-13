@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use Dompdf\Dompdf;
+use Dompdf\Options;
 /**
  * @property \App\Model\Table\BorrowRequestsTable $BorrowRequests
  * @property \App\Model\Table\UsersTable $Users
@@ -268,6 +270,31 @@ public function markAsReturned($id = null)
     $this->set(compact('request'));
 }
 
+public function exportInventoryPdf()
+{
+    $inventoryItems = $this->InventoryItems->find()->all();
 
+    // ✅ Pass $inventoryItems to the view
+    $this->set(compact('inventoryItems'));
+
+    // Load view into variable
+    $this->viewBuilder()->disableAutoLayout();
+    $this->viewBuilder()->setTemplate('pdf_inventory'); // refers to templates/Admins/pdf_inventory.php
+    $html = $this->render()->getBody();
+
+    // Generate PDF
+    $options = new \Dompdf\Options();
+    $options->set('defaultFont', 'Arial');
+    $dompdf = new \Dompdf\Dompdf($options);
+    $dompdf->loadHtml($html);
+    $dompdf->setPaper('A4', 'portrait');
+    $dompdf->render();
+
+    // Output to browser
+    return $this->response
+        ->withType('application/pdf')
+        ->withHeader('Content-Disposition', 'attachment; filename="inventory_list.pdf"')
+        ->withStringBody($dompdf->output());
+}
 
 }

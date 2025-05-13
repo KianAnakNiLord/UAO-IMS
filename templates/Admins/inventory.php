@@ -4,6 +4,7 @@
 <h2>Inventory Management</h2>
 
 <?= $this->Html->link('➕ Add New Item', ['action' => 'addInventory'], ['class' => 'btn primary-btn']) ?>
+<?= $this->Html->link('⬇ Export as PDF', ['action' => 'exportInventoryPdf'], ['class' => 'btn primary-btn']) ?>
 
 
 <div class="inventory-filters">
