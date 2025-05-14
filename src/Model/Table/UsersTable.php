@@ -45,29 +45,42 @@ class UsersTable extends Table
             ->notEmptyString('name');
 
             $validator
-            ->email('email')  // Built-in email validation
-            ->requirePresence('email', 'create')
-            ->notEmptyString('email')
-            ->add('email', 'validFormat', [
-                'rule' => ['custom', '/^\d{11}@my\.xu\.edu\.ph$/'],
-                'message' => 'Please enter a valid Xavier University email address (e.g. 20220024802@my.xu.edu.ph)'
-            ])
-            ->add('email', 'unique', ['rule' => 'validateUnique', 'provider' => 'table']);
-            
+    ->email('email')
+    ->requirePresence('email', 'create')
+    ->notEmptyString('email')
+    ->add('validXavierEmail', 'custom', [
+        'rule' => function ($value, $context) {
+            return (bool)preg_match('/^\d{11}@my\.xu\.edu\.ph$/', (string)$value);
+        },
+        'message' => 'Please use a valid XU email (e.g., 20220000000@my.xu.edu.ph).'
+    ]);
+
         $validator
-            ->scalar('password')
-            ->maxLength('password', 255)
-            ->requirePresence('password', 'create')
-            ->notEmptyString('password');
+    ->scalar('password')
+    ->maxLength('password', 255)
+    ->requirePresence('password', 'create')
+    ->notEmptyString('password')
+    ->add('password', 'strength', [
+        'rule' => function ($value, $context) {
+            return (bool)preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/', (string)$value);
+        },
+        'message' => 'Password must be at least 8 characters and include a number, a lowercase and an uppercase letter.'
+    ]);
+
+
 
         return $validator;
     }
 
     public function buildRules(RulesChecker $rules): RulesChecker
-    {
-        $rules->add($rules->isUnique(['email']), ['errorField' => 'email']);
-        return $rules;
-    }
+{
+    $rules->add($rules->isUnique(
+        ['email'],
+        'This email is already registered.' // ✅ Custom message for uniqueness
+    ));
+    return $rules;
+}
+
 
     /**
      * Used by AuthenticationService to fetch user for login

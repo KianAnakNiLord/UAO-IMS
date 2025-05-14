@@ -297,4 +297,16 @@ public function exportInventoryPdf()
         ->withStringBody($dompdf->output());
 }
 
+public function beforeFilter(\Cake\Event\EventInterface $event)
+{
+    parent::beforeFilter($event);
+
+    $user = $this->request->getAttribute('identity');
+
+    // Block access if not admin
+    if (!$user || $user->role !== 'admin') {
+        $this->Flash->error('You are not authorized to access this page.');
+        return $this->redirect(['controller' => 'Users', 'action' => 'login']);
+    }
+}
 }
