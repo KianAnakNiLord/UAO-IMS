@@ -25,9 +25,40 @@ class AdminsController extends AppController
     }
 
     public function dashboard()
-    {
-        // Admin Dashboard page
-    }
+{
+    $user = $this->request->getAttribute('identity');
+
+    // Quick statistics
+    $totalItems = $this->InventoryItems->find()->count();
+    $pendingRequests = $this->BorrowRequests->find()->where(['status' => 'pending'])->count();
+    $approvedRequests = $this->BorrowRequests->find()->where(['status' => 'approved'])->count();
+    $returnedRequests = $this->BorrowRequests->find()->where(['status' => 'returned'])->count();
+    $overdueRequests = $this->BorrowRequests->find()->where(['status' => 'overdue'])->count();
+
+    // Upcoming returns within 3 days
+    $upcomingReturns = $this->BorrowRequests->find()
+    ->contain(['Users', 'InventoryItems'])
+    ->where([
+        'status' => 'approved',
+        'return_date >=' => date('Y-m-d'),
+        'return_date <=' => date('Y-m-d', strtotime('+3 days'))
+    ])
+    ->order(['return_date' => 'ASC'])
+    ->limit(5)
+    ->all(); // 👈 This makes it a result set so you can use isEmpty()
+
+
+    $this->set(compact(
+        'user',
+        'totalItems',
+        'pendingRequests',
+        'approvedRequests',
+        'returnedRequests',
+        'overdueRequests',
+        'upcomingReturns'
+    ));
+}
+
 
     public function inventory()
 {
@@ -263,27 +294,32 @@ public function markAsReturned($id = null)
         return $this->redirect(['controller' => 'Users', 'action' => 'login']);
     }
 
-    // Get the borrow request
     $request = $this->BorrowRequests->get($id);
 
     if ($this->request->is(['post', 'put'])) {
         $data = $this->request->getData();
-        $request->status = 'returned';
-        $request->return_remark = $data['remark'];
+        $returnedQty = (int)$data['returned_quantity'];
 
-        // ✅ Load inventory item directly and update
+        // Clamp value to not exceed requested
+        $returnedQty = min($returnedQty, $request->quantity_requested);
+        $damagedQty = $request->quantity_requested - $returnedQty;
+
+        // Update return remark with summary
+        $request->status = 'returned';
+        $request->return_remark = "Returned: {$returnedQty} good" . ($damagedQty > 0 ? ", {$damagedQty} damaged" : "");
+
         $inventoryTable = $this->fetchTable('InventoryItems');
         $item = $inventoryTable->get($request->inventory_item_id);
-        $item->quantity += $request->quantity_requested;
-        $item->setDirty('quantity', true); // Force update
+        $item->quantity += $returnedQty;
+        $item->setDirty('quantity', true);
 
         if (
             $this->BorrowRequests->save($request) &&
             $inventoryTable->save($item)
         ) {
-            $this->Flash->success('Request marked as returned and inventory updated.');
+            $this->Flash->success("Marked as returned. {$returnedQty} added to inventory.");
         } else {
-            $this->Flash->error('Could not mark as returned or update inventory.');
+            $this->Flash->error("Could not update inventory or borrow request.");
         }
 
         return $this->redirect(['action' => 'approvedRequests']);
@@ -291,6 +327,7 @@ public function markAsReturned($id = null)
 
     $this->set(compact('request'));
 }
+
 public function markAsOverdue($id = null)
 {
     // Get the borrow request by ID

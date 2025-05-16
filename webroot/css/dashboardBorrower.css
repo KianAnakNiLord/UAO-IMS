@@ -1,0 +1,59 @@
+.dashboard-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 30px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    color: #3A53A4;
+    font-family: Arial, sans-serif;
+}
+
+.dashboard-container h1 {
+    color: #B99433;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.section {
+    margin-bottom: 30px;
+}
+
+.section h2 {
+    color: #3A53A4;
+    border-bottom: 2px solid #B99433;
+    padding-bottom: 5px;
+    margin-bottom: 15px;
+}
+
+.uao-image img {
+    max-width: 100%;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+.instructions ol {
+    padding-left: 20px;
+    line-height: 1.6;
+}
+
+.btn.logout {
+    background-color: #3A53A4;
+    color: white;
+    padding: 10px 16px;
+    text-decoration: none;
+    border-radius: 5px;
+    display: inline-block;
+}
+
+.btn.logout:hover {
+    background-color: #2f418a;
+}
+.uao-contact a {
+    color: #3A53A4;
+    text-decoration: underline;
+}
+
+.uao-contact a:hover {
+    color: #2f418a;
+}

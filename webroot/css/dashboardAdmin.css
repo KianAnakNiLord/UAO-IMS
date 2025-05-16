@@ -1,116 +1,67 @@
-/* ============================
-   Dashboard Styling (dashboardAdmin.css)
-============================= */
-
-/* General Styles */
-body {
-    font-family: 'Segoe UI', sans-serif;
-    background-color: #f5f7fa;
-    margin: 0;
-    padding: 0;
+.admin-dashboard {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 30px;
+    background: white;
+    border-radius: 10px;
+    font-family: Arial, sans-serif;
+    color: #3A53A4;
 }
 
-h1 {
-    color: #3A53A4;
+.admin-dashboard h1 {
+    color: #B99433;
     text-align: center;
-    margin-bottom: 30px;
-}
-
-h3 {
-    color: #3A53A4;
     margin-bottom: 20px;
 }
 
-/* Overview Section with Cards */
-.overview {
-    display: flex;
-    justify-content: space-between;
-    margin: 20px 0;
+.welcome {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 18px;
 }
 
-.overview-card {
-    background-color: white;
+.info-box, .shortcuts, .upcoming, .notes {
+    margin-bottom: 30px;
     padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: 22%;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #f9f9f9;
+}
+
+.info-box ul, .notes ul {
+    padding-left: 20px;
+}
+
+.shortcuts .buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.btn.shortcut {
+    background-color: #3A53A4;
+    color: white;
+    padding: 10px 14px;
+    border-radius: 6px;
+    text-decoration: none;
+}
+
+.btn.shortcut:hover {
+    background-color: #2f418a;
+}
+
+.logout-link {
     text-align: center;
 }
 
-.overview-card h4 {
-    font-size: 18px;
-    color: #3A53A4;
-    margin-bottom: 10px;
-}
-
-.overview-card p {
-    font-size: 24px;
-    color: #333;
-}
-
-/* Notifications Section */
-.notifications {
-    margin: 20px 0;
-}
-
-.notifications table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.notifications th, .notifications td {
-    padding: 10px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-}
-
-.notifications th {
-    background-color: #3A53A4;
+.btn.logout {
+    background-color: #dc3545;
     color: white;
-}
-
-.notifications td {
-    background-color: #fff;
-}
-
-/* Action Buttons */
-.btn {
-    padding: 6px 12px;
-    border-radius: 4px;
+    padding: 10px 14px;
+    border-radius: 6px;
     text-decoration: none;
-    font-size: 14px;
 }
 
-.approve {
-    background-color: green;
-    color: white;
-}
-
-.reject {
-    background-color: red;
-    color: white;
-}
-
-.btn:hover {
-    opacity: 0.8;
-}
-
-/* Admin Links */
-.admin-links ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-.admin-links ul li {
-    margin: 10px 0;
-}
-
-.admin-links a {
-    text-decoration: none;
-    color: #3A53A4;
-    font-weight: bold;
-}
-
-.admin-links a:hover {
-    color: #2c3e94;
+.btn.logout:hover {
+    background-color: #c82333;
 }
