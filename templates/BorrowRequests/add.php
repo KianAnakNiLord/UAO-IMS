@@ -31,10 +31,10 @@
                     </select>
                 </div>
 
-                <!-- ✅ Flat Inventory Dropdown (with data-category) -->
+                <!-- ✅ Flat Inventory Dropdown (with data-category and required) -->
                 <div class="form-group">
                     <label for="inventorySelect">Inventory Item</label>
-                    <select name="inventory_item_id" id="inventorySelect" class="form-control">
+                    <select name="inventory_item_id" id="inventorySelect" class="form-control" required>
                         <option value="">-- Select Item --</option>
                         <?php foreach ($flatInventory as $item): ?>
                             <option value="<?= h($item->id) ?>" data-category="<?= h($item->category) ?>">
@@ -47,35 +47,41 @@
                 <?= $this->Form->control('quantity_requested', [
                     'label' => 'Quantity',
                     'type' => 'number',
-                    'min' => 1
+                    'min' => 1,
+                    'required' => true
                 ]) ?>
 
                 <?= $this->Form->control('request_date', [
                     'label' => 'Request Date',
-                    'empty' => true
+                    'empty' => true,
+                    'required' => true
                 ]) ?>
 
                 <?= $this->Form->control('return_date', [
                     'label' => 'Return Date',
-                    'empty' => true
+                    'empty' => true,
+                    'required' => true
                 ]) ?>
 
                 <?= $this->Form->control('return_time', [
                     'label' => 'Return Time',
                     'type' => 'time',
-                    'empty' => true
+                    'empty' => true,
+                    'required' => true
                 ]) ?>
 
                 <?= $this->Form->control('purpose', [
                     'label' => 'Purpose',
                     'type' => 'textarea',
-                    'placeholder' => 'State the reason for borrowing...'
+                    'placeholder' => 'State the reason for borrowing...',
+                    'required' => true
                 ]) ?>
 
                 <?= $this->Form->control('id_image', [
                     'type' => 'file',
                     'label' => 'Upload Student/Employee ID',
-                    'accept' => 'image/*'
+                    'accept' => 'image/*',
+                    'required' => true
                 ]) ?>
             </fieldset>
             <?= $this->Form->button(__('Submit')) ?>

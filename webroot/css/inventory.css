@@ -1,4 +1,4 @@
-/* inventory.css - Polished Xavier-Style Inventory Management */
+/* inventory.css - Updated with Gold Accent (Xavier Style) */
 
 /* Main Container */
 .inventory-wrapper {
@@ -10,38 +10,63 @@
     margin: 40px auto;
 }
 
-/* Header + Add Button */
+/* Header + Button Group */
 .inventory-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 25px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
 }
 
 .inventory-header h2 {
-    color: #3A53A4;
+    color: #B99433; /* Gold title */
     font-size: 28px;
-    font-weight: 600;
+    font-weight: 700;
     margin: 0;
 }
 
-.inventory-header a.button,
-.inventory-filters .button {
-    background-color: #3A53A4;
-    color: white;
-    padding: 10px 18px;
-    border-radius: 6px;
-    font-weight: 500;
-    font-size: 15px;
-    text-decoration: none;
-    box-shadow: 0 4px 10px rgba(58, 83, 164, 0.2);
-    transition: all 0.3s ease;
+.inventory-header .button-group {
+    display: flex;
+    gap: 12px;
+    margin-top: 12px;
 }
 
-.inventory-header a.button:hover,
-.inventory-filters .button:hover {
-    background-color: #2c3e94;
-    box-shadow: 0 6px 16px rgba(58, 83, 164, 0.3);
+/* Standard Button */
+.btn {
+    display: inline-block;
+    padding: 8px 14px;
+    font-size: 14px;
+    text-align: center;
+    border-radius: 6px;
+    text-decoration: none !important;
+    font-weight: 500;
+    transition: all 0.3s ease-in-out;
+    border: none;
+    background-color: #3A53A4;
+    color: white;
+}
+
+/* Export as PDF button with gold accent */
+.export-btn {
+    border: 2px solid #B99433;
+    background-color: white;
+    color: #B99433;
+}
+
+.export-btn:hover {
+    background-color: #B99433;
+    color: white;
+}
+
+/* Primary Button */
+.primary-btn {
+    background-color: #3A53A4;
+    color: white;
+}
+
+.primary-btn:hover {
+    background-color: #2f418a;
 }
 
 /* Filters Section */
@@ -126,17 +151,31 @@ td .button:hover {
     box-shadow: 0 3px 10px rgba(58, 83, 164, 0.25);
 }
 
-.button.danger {
+/* Danger Button */
+.button.danger,
+.danger-btn {
     background-color: #d9534f;
+    color: white;
     box-shadow: 0 2px 6px rgba(217, 83, 79, 0.2);
 }
 
-.button.danger:hover {
+.button.danger:hover,
+.danger-btn:hover {
     background-color: #c9302c;
     box-shadow: 0 3px 10px rgba(217, 83, 79, 0.25);
 }
 
-/* === Add/Edit Inventory Form Styles === */
+/* Small Utility Button */
+.small-btn {
+    font-size: 13px;
+    padding: 6px 10px;
+    margin-right: 5px;
+    display: inline-block;
+    background-color: #3A53A4;
+    color: white;
+}
+
+/* === Add/Edit Form === */
 .inventory-form-wrapper {
     display: flex;
     justify-content: center;
@@ -197,50 +236,3 @@ td .button:hover {
 .inventory-btn:hover {
     background-color: #2d4299;
 }
-
-/* ========================
-   ✅ Button Styling Update
-   ======================== */
-   .btn {
-    display: inline-block;
-    padding: 8px 14px;
-    font-size: 14px;
-    text-align: center;
-    border-radius: 6px;
-    text-decoration: none !important; /* Important here */
-    font-weight: 500;
-    transition: all 0.3s ease-in-out;
-    border: none;
-    background-color: #3A53A4; /* Add fallback */
-    color: white;
-}
-.primary-btn {
-    background-color: #3A53A4;
-    color: white;
-    margin-bottom: 20px;
-}
-
-.primary-btn:hover {
-    background-color: #2f418a;
-    text-decoration: none;
-}
-
-.danger-btn {
-    background-color: #d9534f;
-    color: white;
-}
-
-.danger-btn:hover {
-    background-color: #c9302c;
-    text-decoration: none;
-}
-
-.small-btn {
-    font-size: 13px;
-    padding: 6px 10px;
-    margin-right: 5px;
-    display: inline-block;
-    background-color: #3A53A4;
-    color: white;
-}
-

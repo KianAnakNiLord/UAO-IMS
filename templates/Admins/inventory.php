@@ -1,9 +1,13 @@
+<!-- templates/Admins/inventory.php -->
 <?= $this->Html->css('inventory') ?>
 
-<h2>Inventory Management</h2>
-
-<?= $this->Html->link('➕ Add New Item', ['action' => 'addInventory'], ['class' => 'btn primary-btn']) ?>
-<?= $this->Html->link('⬇ Export as PDF', ['action' => 'exportInventoryPdf'], ['class' => 'btn primary-btn']) ?>
+<div class="inventory-header">
+    <h2>Inventory Management</h2>
+    <div class="button-group">
+        <?= $this->Html->link('➕ Add New Item', ['action' => 'addInventory'], ['class' => 'btn primary-btn']) ?>
+        <?= $this->Html->link('⬇ Export as PDF', ['action' => 'exportInventoryPdf'], ['class' => 'btn export-btn']) ?>
+    </div>
+</div>
 
 <div class="inventory-filters">
     <?= $this->Form->create(null, ['type' => 'get']) ?>
@@ -42,8 +46,7 @@
             <th>Name</th>
             <th>Category</th>
             <th>Condition</th>
-            <th>Available</th>
-            <th>Borrowed</th>
+            <th>Quantity</th>
             <th>Procurement Date</th>
             <th>Description</th>
             <th>Actions</th>
@@ -55,8 +58,11 @@
             <td><?= h($item->name) ?></td>
             <td><?= h(ucwords(str_replace('_', ' ', $item->category))) ?></td>
             <td><?= h(ucwords($item->item_condition)) ?></td>
-            <td><?= h($item->quantity) ?></td>
-            <td><?= h($item->total_borrowed ?? 0) ?></td>
+            <td>
+                <?= h($item->quantity) ?>
+                <br>
+                <small style="color: gray;">Borrowed: <?= h($item->total_borrowed ?? 0) ?></small>
+            </td>
             <td><?= h($item->procurement_date) ?></td>
             <td><?= h($item->description) ?></td>
             <td>

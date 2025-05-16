@@ -391,4 +391,20 @@ public function beforeFilter(\Cake\Event\EventInterface $event)
         return $this->redirect(['controller' => 'Users', 'action' => 'login']);
     }
 }
+
+public function deleteHistory($id = null)
+{
+    $this->request->allowMethod(['post', 'delete']);
+
+    $request = $this->BorrowRequests->get($id);
+
+    if ($this->BorrowRequests->delete($request)) {
+        $this->Flash->success('Borrow request history deleted.');
+    } else {
+        $this->Flash->error('Could not delete the borrow request.');
+    }
+
+    return $this->redirect(['action' => 'history']);
+}
+
 }
