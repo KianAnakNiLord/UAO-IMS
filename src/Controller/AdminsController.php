@@ -30,29 +30,51 @@ class AdminsController extends AppController
     }
 
     public function inventory()
-    {
-        $this->InventoryItems = $this->fetchTable('InventoryItems');
+{
+    $this->InventoryItems = $this->fetchTable('InventoryItems');
+    $this->BorrowRequests = $this->fetchTable('BorrowRequests');
 
-        $query = $this->InventoryItems->find();
+    // Base query
+    $query = $this->InventoryItems->find();
 
-        // Filtering
-        $search = $this->request->getQuery('search');
-        $category = $this->request->getQuery('category');
+    // Join and aggregate only approved borrow requests
+    $query = $query
+        ->select([
+            'InventoryItems.id',
+            'InventoryItems.name',
+            'InventoryItems.category',
+            'InventoryItems.item_condition',
+            'InventoryItems.quantity',
+            'InventoryItems.procurement_date',
+            'InventoryItems.description',
+            'total_borrowed' => $query->func()->coalesce([
+                $query->func()->sum('BorrowRequests.quantity_requested'), 0
+            ])
+        ])
+        ->leftJoinWith('BorrowRequests', function ($q) {
+            return $q->where(['BorrowRequests.status' => 'approved']);
+        })
+        ->group(['InventoryItems.id']);
 
-        if ($search) {
-            $query->where(function ($exp, $q) use ($search) {
-                return $exp->like('name', '%' . $search . '%');
-            });
-        }
+    // Filtering
+    $search = $this->request->getQuery('search');
+    $category = $this->request->getQuery('category');
 
-        if ($category) {
-            $query->where(['category' => $category]);
-        }
-
-        $inventoryItems = $this->paginate($query);
-
-        $this->set(compact('inventoryItems', 'search', 'category'));
+    if ($search) {
+        $query->where(function ($exp, $q) use ($search) {
+            return $exp->like('InventoryItems.name', '%' . $search . '%');
+        });
     }
+
+    if ($category) {
+        $query->where(['InventoryItems.category' => $category]);
+    }
+
+    $inventoryItems = $this->paginate($query);
+    $this->set(compact('inventoryItems', 'search', 'category'));
+}
+
+
 
     public function addInventory()
     {
