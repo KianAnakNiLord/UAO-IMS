@@ -1,7 +1,8 @@
 /* ===============================
    Approved Requests Page Styles
    =============================== */
-   table {
+
+table {
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 30px;
@@ -20,19 +21,6 @@ table th {
 
 table td {
     background-color: #f9f9f9;
-}
-
-.btn.mark-returned {
-    background-color: #28a745;
-    color: white;
-    padding: 6px 12px;
-    border-radius: 4px;
-    text-decoration: none;
-    transition: background-color 0.3s ease;
-}
-
-.btn.mark-returned:hover {
-    background-color: #218838;
 }
 
 h1 {
@@ -62,4 +50,40 @@ form button {
 
 form button:hover {
     background-color: #2f418a;
+}
+
+/* Green - Mark as Returned Button */
+.btn.mark-returned {
+    background-color: #28a745;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.btn.mark-returned:hover {
+    background-color: #218838;
+}
+
+/* Red - Mark as Overdue Button */
+.btn.mark-overdue {
+    background-color: #dc3545;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.btn.mark-overdue:hover {
+    background-color: #c82333;
+}
+
+/* Stack Action Buttons Vertically */
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
 }

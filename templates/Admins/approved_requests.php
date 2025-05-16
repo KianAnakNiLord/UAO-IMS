@@ -2,7 +2,6 @@
 
 <h1>Approved Borrow Requests</h1>
 
-<!-- Approved Requests Table -->
 <table>
     <thead>
         <tr>
@@ -10,6 +9,8 @@
             <th>Item</th>
             <th>Quantity</th>
             <th>Return Date</th>
+            <th>Return Time</th>
+            <th>ID Photo</th>
             <th>Action</th>
         </tr>
     </thead>
@@ -20,8 +21,28 @@
             <td><?= h($request->inventory_item->name) ?></td>
             <td><?= h($request->quantity_requested) ?></td>
             <td><?= h($request->return_date) ?></td>
+            <td><?= h($request->return_time) ?></td>
             <td>
-                <?= $this->Html->link('Mark as Returned', ['action' => 'markAsReturned', $request->id], ['class' => 'btn mark-returned']) ?>
+                <?php if (!empty($request->id_image)): ?>
+                    <?php $imagePath = ltrim($request->id_image, '/\\'); ?>
+                    <a href="<?= $this->Url->build('/' . $imagePath) ?>" target="_blank">
+                        <img src="<?= $this->Url->build('/' . $imagePath) ?>" alt="ID Photo" style="max-width:100px; max-height:100px;">
+                    </a>
+                <?php else: ?>
+                    <span>No image</span>
+                <?php endif; ?>
+            </td>
+            <td>
+                <div class="action-buttons">
+                    <?= $this->Html->link('Mark as Returned', ['action' => 'markAsReturned', $request->id], ['class' => 'btn mark-returned']) ?>
+
+                    <?php if ($request->status !== 'overdue'): ?>
+                        <?= $this->Form->postLink('Mark as Overdue', ['action' => 'markAsOverdue', $request->id], [
+                            'confirm' => 'Are you sure you want to mark this as overdue?',
+                            'class' => 'btn mark-overdue'
+                        ]) ?>
+                    <?php endif; ?>
+                </div>
             </td>
         </tr>
         <?php endforeach; ?>

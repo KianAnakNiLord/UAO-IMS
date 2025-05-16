@@ -164,18 +164,25 @@ public function delete($id = null)
     $this->request->allowMethod(['post', 'delete']);
     $borrowRequest = $this->BorrowRequests->get($id);
 
-    // Ensure that only the owner of the request can delete it
     $identity = $this->request->getAttribute('identity');
+
+    // ✅ Only allow delete if owner and status is 'pending' or 'rejected'
     if ($borrowRequest->user_id !== $identity->get('id')) {
         $this->Flash->error(__('You are not authorized to delete this request.'));
+        return $this->redirect(['action' => 'index']);
+    }
+
+    if (!in_array($borrowRequest->status, ['pending', 'rejected'])) {
+        $this->Flash->error(__('You can only delete requests that are pending or rejected.'));
         return $this->redirect(['action' => 'index']);
     }
 
     if ($this->BorrowRequests->delete($borrowRequest)) {
         $this->Flash->success(__('The borrow request has been deleted.'));
     } else {
-        $this->Flash->error(__('The borrow request could not be deleted. Please, try again.'));
+        $this->Flash->error(__('The borrow request could not be deleted. Please try again.'));
     }
+
     return $this->redirect(['action' => 'index']);
 }
 

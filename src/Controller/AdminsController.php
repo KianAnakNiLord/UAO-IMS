@@ -225,7 +225,7 @@ class AdminsController extends AppController
     $approvedRequests = $this->BorrowRequests
         ->find('all')
         ->contain(['Users', 'InventoryItems'])
-        ->where(['BorrowRequests.status' => 'approved']) // Filter approved requests
+        ->where(['BorrowRequests.status IN' => ['approved', 'overdue']]) // Filter approved requests
         ->order(['BorrowRequests.created' => 'DESC']);  // Specify the table for the 'created' column
 
     $this->set(compact('approvedRequests'));
@@ -269,6 +269,29 @@ public function markAsReturned($id = null)
 
     $this->set(compact('request'));
 }
+public function markAsOverdue($id = null)
+{
+    // Get the borrow request by ID
+    $request = $this->BorrowRequests->get($id);
+
+    // Only allow if the request is POST or PUT
+    if ($this->request->is(['post', 'put'])) {
+        // Mark as overdue
+        $request->status = 'overdue';
+        $request->return_remark = 'Marked overdue by admin';
+
+        // Save and give feedback
+        if ($this->BorrowRequests->save($request)) {
+            $this->Flash->success('Request marked as overdue.');
+        } else {
+            $this->Flash->error('Could not mark as overdue.');
+        }
+    }
+
+    // Redirect back to Approved Requests page
+    return $this->redirect(['action' => 'approvedRequests']);
+}
+
 
 public function exportInventoryPdf()
 {
