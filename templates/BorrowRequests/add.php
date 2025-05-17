@@ -93,6 +93,7 @@
 <!-- ✅ Filter inventory items by category -->
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    // ✅ Category Filter Functionality
     const categoryFilter = document.getElementById('categoryFilter');
     const inventorySelect = document.getElementById('inventorySelect');
 
@@ -111,5 +112,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
         inventorySelect.selectedIndex = 0;
     });
+
+    // ✅ Prevent selecting past dates for request/return
+    const today = new Date().toISOString().split('T')[0];
+    const requestDateInput = document.getElementById('request-date');
+    const returnDateInput = document.getElementById('return-date');
+
+    if (requestDateInput) requestDateInput.setAttribute('min', today);
+    if (returnDateInput) returnDateInput.setAttribute('min', today);
 });
 </script>
+

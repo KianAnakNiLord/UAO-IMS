@@ -27,17 +27,34 @@ class BorrowRequestsController extends AppController
     $user = $this->request->getAttribute('identity');
     $isAdmin = $user && $user->get('role') === 'admin';
 
+    // ✅ Auto-mark overdue if return_date + return_time is in the past
+    $now = new \DateTime();
+
+    $overdueRequests = $this->BorrowRequests->find()
+        ->where(['status IN' => ['approved', 'pending']])
+        ->all();
+
+    foreach ($overdueRequests as $request) {
+        if ($request->return_date && $request->return_time) {
+            $due = new \DateTime($request->return_date->format('Y-m-d') . ' ' . $request->return_time->format('H:i:s'));
+            if ($now > $due) {
+                $request->status = 'overdue';
+                $this->BorrowRequests->save($request);
+            }
+        }
+    }
+
     $query = $isAdmin
         ? $this->BorrowRequests->find('all')->contain(['Users', 'InventoryItems'])
         : $this->BorrowRequests->find('all')
             ->where(['user_id' => $user?->get('id')])
             ->contain(['InventoryItems']);
 
-    // 🔥 This enables pagination
     $borrowRequests = $this->paginate($query);
 
     $this->set(compact('borrowRequests'));
 }
+
 
     // ✅ Borrower - Submit Request
     // ✅ Borrower - Submit Request

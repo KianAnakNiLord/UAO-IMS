@@ -244,27 +244,33 @@ class AdminsController extends AppController
     }
 
     public function history()
-    {
-        // Get search query from the GET request
-        $search = $this->request->getQuery('email');
+{
+    // Get search queries from GET
+    $emailSearch = $this->request->getQuery('email');
+    $nameSearch = $this->request->getQuery('name');
 
-        // Build query for finding the borrow requests
-        $query = $this->BorrowRequests->find()
-            ->contain(['Users', 'InventoryItems'])
-            ->where(['BorrowRequests.status IN' => ['approved', 'rejected', 'returned']])
+    // Build base query
+    $query = $this->BorrowRequests->find()
+        ->contain(['Users', 'InventoryItems'])
+        ->where(['BorrowRequests.status IN' => ['approved', 'rejected', 'returned']])
+        ->order(['BorrowRequests.created' => 'DESC']);
 
-            ->order(['BorrowRequests.created' => 'DESC']);
-
-        if ($search) {
-            $query->where(['Users.email LIKE' => '%' . $search . '%']);
-        }
-
-        // Paginate the results
-        $history = $this->paginate($query);
-
-        // Set the data for the view
-        $this->set(compact('history'));
+    // Apply filters
+    if (!empty($emailSearch)) {
+        $query->where(['Users.email LIKE' => '%' . $emailSearch . '%']);
     }
+
+    if (!empty($nameSearch)) {
+        $query->where(['Users.name LIKE' => '%' . $nameSearch . '%']);
+    }
+
+    // Paginate results
+    $history = $this->paginate($query);
+
+    // Set for view
+    $this->set(compact('history'));
+}
+
     public function approvedRequests()
 {
     $user = $this->request->getAttribute('identity'); // Get the logged-in user

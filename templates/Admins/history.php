@@ -7,6 +7,14 @@
     <div class="history-search">
         <?= $this->Form->create(null, ['type' => 'get']) ?>
             <div class="input">
+                <?= $this->Form->label('name', 'Name') ?>
+                <?= $this->Form->control('name', [
+                    'type' => 'text',
+                    'label' => false,
+                    'placeholder' => 'Enter name to search'
+                ]) ?>
+            </div>
+            <div class="input">
                 <?= $this->Form->label('email', 'Email') ?>
                 <?= $this->Form->control('email', [
                     'type' => 'text',
@@ -68,7 +76,7 @@
                         </tr>
                     <?php endforeach; ?>
                 <?php else: ?>
-                    <tr><td colspan="8">No history found for the provided email.</td></tr>
+                    <tr><td colspan="8">No history found for the provided criteria.</td></tr>
                 <?php endif; ?>
             </tbody>
         </table>
