@@ -236,3 +236,28 @@ td .button:hover {
 .inventory-btn:hover {
     background-color: #2d4299;
 }
+
+/* === Condition Tags === */
+.condition-tag {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    color: white;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.condition-new {
+    background-color: #28a745; /* Green */
+}
+
+.condition-used {
+    background-color: #ffc107; /* Yellow */
+    color: #333;
+}
+
+.condition-damaged {
+    background-color: #dc3545; /* Red */
+}

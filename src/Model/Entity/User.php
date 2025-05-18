@@ -27,14 +27,18 @@ class User extends Entity implements IdentityInterface
      * @var array<string, bool>
      */
     protected array $_accessible = [
-        'role' => true,
-        'name' => true,
-        'email' => true,
-        'password' => true,
-        'created' => true,
-        'modified' => true,
-        'borrow_requests' => true,
-    ];
+    'role' => true,
+    'name' => true,
+    'email' => true,
+    'password' => true,
+    'otp_code' => true,          // ✅ allow OTP to be saved
+    'otp_expires_at' => true,    // ✅ allow expiry date to be saved
+    'is_verified' => true,       // ✅ allow verification status
+    'created' => true,
+    'modified' => true,
+    'borrow_requests' => true,
+];
+
 
     /**
      * Fields that are excluded from JSON versions of the entity.

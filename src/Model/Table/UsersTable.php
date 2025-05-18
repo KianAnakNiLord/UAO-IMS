@@ -89,7 +89,7 @@ class UsersTable extends Table
 {
     Log::write('debug', '✅ findAuth() triggered');
     return $query->select([
-        'id', 'name', 'email', 'password', 'role'
+        'id', 'name', 'email', 'password', 'role', 'is_verified'
     ]);
 }
     

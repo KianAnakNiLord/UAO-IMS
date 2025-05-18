@@ -57,7 +57,21 @@
         <tr>
             <td><?= h($item->name) ?></td>
             <td><?= h(ucwords(str_replace('_', ' ', $item->category))) ?></td>
-            <td><?= h(ucwords($item->item_condition)) ?></td>
+            <td>
+    <?php
+        $condition = strtolower($item->item_condition);
+        $conditionClass = match ($condition) {
+            'new' => 'condition-new',
+            'used' => 'condition-used',
+            'damaged' => 'condition-damaged',
+            default => ''
+        };
+    ?>
+    <span class="condition-tag <?= $conditionClass ?>">
+        <?= ucfirst(h($condition)) ?>
+    </span>
+</td>
+
             <td>
                 <?= h($item->quantity) ?>
                 <br>

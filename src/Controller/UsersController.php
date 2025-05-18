@@ -8,6 +8,9 @@ use Cake\Event\EventInterface;
 use Cake\Utility\Security;
 use Cake\Log\Log;
 use Authentication\PasswordHasher\DefaultPasswordHasher;
+use Cake\Mailer\Mailer;
+use Cake\Chronos\Chronos;
+
 
 /**
  * Users Controller
@@ -29,7 +32,7 @@ class UsersController extends AppController
         parent::beforeFilter($event);
 
         // Allow non-authenticated users to access login and register
-        $this->Authentication->addUnauthenticatedActions(['login', 'register','logtest']);
+        $this->Authentication->addUnauthenticatedActions(['login', 'register','logtest', 'verifyOtp']);
     }
 
 
@@ -41,22 +44,23 @@ public function login()
     if ($this->request->is('post')) {
         $data = $this->request->getData();
 
-        // 🔍 Manual DB lookup for logging and fallback
         $user = $this->Users->find('auth')
             ->where(['email' => $data['email']])
             ->first();
 
         if ($user) {
             $hasher = new DefaultPasswordHasher();
-            if ($hasher->check($data['password'], $user->password)) {
-                Log::write('debug', '✅ Password matches manually!');
 
-                // ✅ Set identity manually (fallback)
+           if ($user->role !== 'admin' && (string)$user->is_verified !== '1') {
+                $this->Flash->error('This account is not yet verified. Please check your email and enter the OTP.');
+                return;
+            }
+            if ($hasher->check($data['password'], $user->password)) {
+                // ✅ NO more OTP checking here
+
                 $this->Authentication->setIdentity($user);
                 $this->request = $this->request->withAttribute('identity', $user);
-                Log::write('debug', '✅ Manually set identity for login');
 
-                // 🎯 Role-based redirect
                 if ($user->role === 'admin') {
                     return $this->redirect(['controller' => 'Admins', 'action' => 'dashboard']);
                 } elseif ($user->role === 'borrower') {
@@ -64,26 +68,19 @@ public function login()
                 } else {
                     return $this->redirect('/');
                 }
-
             } else {
-                Log::write('debug', '❌ Manual password check failed');
                 $this->Flash->error('Invalid email or password.');
             }
         } else {
-            Log::write('debug', '❌ User not found by email');
             $this->Flash->error('Invalid email or password.');
         }
 
-        // ⛔ Log failed Authentication result from plugin
         if (!$result->isValid()) {
             Log::write('debug', '❌ CakePHP Authentication plugin failed');
             Log::write('debug', print_r($result, true));
         }
     }
 }
-
-    
-
 
     public function logout()
     {
@@ -96,25 +93,46 @@ public function login()
     }
 
     public function register()
-    {
-        $user = $this->Users->newEmptyEntity();
+{
+    $user = $this->Users->newEmptyEntity();
 
-        if ($this->request->is('post')) {
-            $user = $this->Users->patchEntity($user, $this->request->getData());
+    if ($this->request->is('post')) {
+        $data = $this->request->getData();
 
-            // Always set role to 'borrower' for public registrations
-            $user->role = 'borrower';
+        // Generate OTP and expiration
+        $otp = str_pad(strval(random_int(100000, 999999)), 6, '0', STR_PAD_LEFT);
+        $data['otp_code'] = $otp;
+        $data['otp_expires_at'] = Chronos::now()->addMinutes(10);
+        $data['is_verified'] = false;
+        $data['role'] = 'borrower';
 
+        $user = $this->Users->patchEntity($user, $data);
+
+        try {
+            // Send the email first
+            $mailer = new Mailer('default');
+            $mailer->setFrom(['noreply@uao-ims.test' => 'UAO IMS'])
+                ->setTo($data['email'])
+                ->setSubject('UAO IMS Email Verification')
+                ->deliver("Your OTP is: {$otp}\n\nThis code expires in 10 minutes.");
+
+            // If email was sent successfully, save the user
             if ($this->Users->save($user)) {
-                $this->Flash->success('Registration successful. Please log in.');
-                return $this->redirect(['action' => 'login']);
+                $this->Flash->success('Registration successful! Check your email for the OTP code.');
+                return $this->redirect(['action' => 'verifyOtp', $user->id]);
+            } else {
+                $this->Flash->error('User could not be saved. Please try again.');
             }
-
-            $this->Flash->error('Registration failed. Please check the form and try again.');
+        } catch (\Exception $e) {
+            // Log and inform if email failed
+            Log::write('error', 'OTP Email Error: ' . $e->getMessage());
+            $this->Flash->error('Unable to send OTP email. Registration was not completed.');
         }
-
-        $this->set(compact('user'));
     }
+
+    $this->set(compact('user'));
+}
+
 
     // 🧠 CRUD functions (from bake)
     public function index()
@@ -188,4 +206,32 @@ public function generateAdminPassword()
     debug($hashed);
     die;
 }
+
+public function verifyOtp($userId = null)
+{
+    $user = $this->Users->get($userId);
+
+    if ($this->request->is('post')) {
+        $submittedOtp = $this->request->getData('otp');
+
+        if ($user->otp_code === $submittedOtp && $user->otp_expires_at > Chronos::now()) {
+            $user->is_verified = true;
+            $user->otp_code = null;
+            $user->otp_expires_at = null;
+
+            if ($this->Users->save($user)) {
+                $this->Flash->success('✅ Email verified successfully. You may now log in.');
+                return $this->redirect(['action' => 'login']);
+            } else {
+                $this->Flash->error('⚠️ Verification failed. Please try again.');
+            }
+        } else {
+            $this->Flash->error('❌ Invalid or expired OTP.');
+        }
+    }
+
+    $this->set(compact('user'));
 }
+
+}
+
