@@ -26,6 +26,10 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
 {
     public function bootstrap(): void
     {
+        // ✅ FORCE PHP to use Asia/Manila timezone
+        date_default_timezone_set('Asia/Manila');
+        ini_set('date.timezone', 'Asia/Manila');
+
         parent::bootstrap();
 
         if (PHP_SAPI !== 'cli') {

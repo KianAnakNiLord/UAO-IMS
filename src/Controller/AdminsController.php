@@ -5,6 +5,8 @@ namespace App\Controller;
 
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use Cake\Mailer\Mailer;
+use Cake\Log\Log;
 /**
  * @property \App\Model\Table\BorrowRequestsTable $BorrowRequests
  * @property \App\Model\Table\UsersTable $Users
@@ -171,6 +173,8 @@ class AdminsController extends AppController
 }
     public function borrowRequests()
     {
+        $this->autoMarkOverdue();
+
         $requests = $this->BorrowRequests
             ->find('all')
             ->contain(['Users', 'InventoryItems'])
@@ -182,15 +186,40 @@ class AdminsController extends AppController
 
     public function approveRequest($id = null)
 {
-    $request = $this->BorrowRequests->get($id, ['contain' => ['InventoryItems']]);
+    $this->autoMarkOverdue();
+
+    $request = $this->BorrowRequests->get($id, ['contain' => ['Users', 'InventoryItems']]);
     $request->status = 'approved';
 
-    // Deduct quantity
     $item = $request->inventory_item;
     $item->quantity -= $request->quantity_requested;
+    $item->setDirty('quantity', true); // ✅ REQUIRED!
 
-    if ($this->BorrowRequests->save($request) && $this->fetchTable('InventoryItems')->save($item)) {
+    $saveRequest = $this->BorrowRequests->save($request);
+    $saveItem = $this->fetchTable('InventoryItems')->save($item); // or just use $this->InventoryItems if already fetched
+
+    if ($saveRequest && $saveItem) {
         $this->Flash->success('Request approved successfully and inventory updated.');
+
+        // ✅ Send email
+        if ($request->user && $item) {
+            $user = $request->user;
+            $mailer = new Mailer('default');
+
+            $emailResult = $mailer->setFrom(['noreply@uao-ims.test' => 'UAO IMS'])
+                ->setTo($user->email)
+                ->setSubject('Borrow Request Approved')
+                ->deliver(
+                    "Hello {$user->name},\n\n" .
+                    "Your borrow request for \"{$item->name}\" has been approved.\n\n" .
+                    "Please return the item by {$request->return_date} at {$request->return_time}.\n\n" .
+                    "Thank you,\nUAO Inventory Team"
+                );
+
+            echo "<script>alert('📧 Email sent to {$user->email}');</script>";
+        } else {
+            echo "<script>alert('❌ Email not sent — missing user or item info.');</script>";
+        }
     } else {
         $this->Flash->error('Could not approve request or update inventory.');
     }
@@ -198,27 +227,50 @@ class AdminsController extends AppController
     return $this->redirect(['action' => 'borrowRequests']);
 }
 
+public function rejectRequest($id = null)
+{
+    $request = $this->BorrowRequests->get($id, ['contain' => ['Users', 'InventoryItems']]);
 
-    public function rejectRequest($id = null)
-    {
-        $request = $this->BorrowRequests->get($id);
+    if ($this->request->is(['post', 'put'])) {
+        $data = $this->request->getData();
+        $request->status = 'rejected';
+        $request->rejection_reason = $data['rejection_reason'];
 
-        if ($this->request->is(['post', 'put'])) {
-            $data = $this->request->getData();
-            $request->status = 'rejected';
-            $request->rejection_reason = $data['rejection_reason'];
+        if ($this->BorrowRequests->save($request)) {
+            $this->Flash->success('Request rejected with reason.');
 
-            if ($this->BorrowRequests->save($request)) {
-                $this->Flash->success('Request rejected with reason.');
+            // ✅ Send rejection email
+            if ($request->user && $request->inventory_item) {
+                $user = $request->user;
+                $item = $request->inventory_item;
+
+                $mailer = new Mailer('default');
+                $mailer->setFrom(['noreply@uao-ims.test' => 'UAO IMS'])
+                    ->setTo($user->email)
+                    ->setSubject('Borrow Request Rejected')
+                    ->deliver(
+                        "Hello {$user->name},\n\n" .
+                        "Your borrow request for \"{$item->name}\" has been rejected.\n\n" .
+                        "Reason: {$request->rejection_reason}\n\n" .
+                        "Please contact the UAO office if you need further assistance.\n\n" .
+                        "Thank you,\nUAO Inventory Team"
+                    );
+
+                echo "<script>alert('📧 Rejection email sent to {$user->email}');</script>";
             } else {
-                $this->Flash->error('Could not reject the request.');
+                echo "<script>alert('❌ Email not sent — missing user or item info.');</script>";
             }
 
-            return $this->redirect(['action' => 'borrowRequests']);
+        } else {
+            $this->Flash->error('Could not reject the request.');
         }
 
         return $this->redirect(['action' => 'borrowRequests']);
     }
+
+    return $this->redirect(['action' => 'borrowRequests']);
+}
+
 
     public function rejectForm($id)
     {
@@ -228,6 +280,8 @@ class AdminsController extends AppController
 
     public function adminDashboard()
     {
+        $this->autoMarkOverdue();
+
         $user = $this->request->getAttribute('identity'); // Get the logged-in user
 
         // Redirect to the login page if the user is not authenticated or not an admin
@@ -411,6 +465,46 @@ public function deleteHistory($id = null)
     }
 
     return $this->redirect(['action' => 'history']);
+}
+private function autoMarkOverdue(): void
+{
+    $now = new \DateTime();
+
+    $requests = $this->BorrowRequests->find()
+        ->contain(['Users', 'InventoryItems'])
+        ->where(['status IN' => ['approved', 'pending']])
+        ->all();
+
+    foreach ($requests as $request) {
+        if ($request->return_date && $request->return_time) {
+            $due = new \DateTime($request->return_date->format('Y-m-d') . ' ' . $request->return_time->format('H:i:s'));
+
+            if ($now > $due && $request->status !== 'overdue') {
+                $request->status = 'overdue';
+                $request->return_remark = 'Automatically marked overdue by system';
+
+                if ($this->BorrowRequests->save($request)) {
+                    // Send email if user and item info exist
+                    if ($request->user && $request->inventory_item) {
+                        $user = $request->user;
+                        $item = $request->inventory_item;
+
+                        $mailer = new Mailer('default');
+                        $mailer->setFrom(['noreply@uao-ims.test' => 'UAO IMS'])
+                            ->setTo($user->email)
+                            ->setSubject('Borrow Request Overdue')
+                            ->deliver(
+                                "Hello {$user->name},\n\n" .
+                                "Your borrow request for \"{$item->name}\" is now marked as OVERDUE.\n\n" .
+                                "Return Due: {$request->return_date->format('Y-m-d')} at {$request->return_time->format('H:i')}\n\n" .
+                                "Please return the item immediately to avoid any further issues.\n\n" .
+                                "Thank you,\nUAO Inventory Team"
+                            );
+                    }
+                }
+            }
+        }
+    }
 }
 
 }

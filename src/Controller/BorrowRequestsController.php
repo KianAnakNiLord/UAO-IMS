@@ -6,7 +6,7 @@ namespace App\Controller;
  * @property \App\Model\Table\BorrowRequestsTable $BorrowRequests
  * @property \App\Model\Table\InventoryItemsTable $InventoryItems
  */
-
+use Cake\Mailer\Mailer;
 
 class BorrowRequestsController extends AppController
 {
@@ -31,19 +31,41 @@ class BorrowRequestsController extends AppController
     $now = new \DateTime();
 
     $overdueRequests = $this->BorrowRequests->find()
+        ->contain(['Users', 'InventoryItems']) // ✅ Needed for email sending
         ->where(['status IN' => ['approved', 'pending']])
         ->all();
 
     foreach ($overdueRequests as $request) {
         if ($request->return_date && $request->return_time) {
             $due = new \DateTime($request->return_date->format('Y-m-d') . ' ' . $request->return_time->format('H:i:s'));
-            if ($now > $due) {
+            if ($now > $due && $request->status !== 'overdue') {
                 $request->status = 'overdue';
-                $this->BorrowRequests->save($request);
+                $request->return_remark = 'Automatically marked overdue by system';
+
+                if ($this->BorrowRequests->save($request)) {
+                    // ✅ Send overdue email
+                    if ($request->user && $request->inventory_item) {
+                        $user = $request->user;
+                        $item = $request->inventory_item;
+
+                        $mailer = new Mailer('default');
+                        $mailer->setFrom(['noreply@uao-ims.test' => 'UAO IMS'])
+                            ->setTo($user->email)
+                            ->setSubject('Borrow Request Overdue')
+                            ->deliver(
+                                "Hello {$user->name},\n\n" .
+                                "Your borrow request for \"{$item->name}\" is now marked as OVERDUE.\n\n" .
+                                "Return Due: {$request->return_date->format('Y-m-d')} at {$request->return_time->format('H:i')}\n\n" .
+                                "Please return the item immediately to avoid any further issues.\n\n" .
+                                "Thank you,\nUAO Inventory Team"
+                            );
+                    }
+                }
             }
         }
     }
 
+    // Display filtered borrow requests
     $query = $isAdmin
         ? $this->BorrowRequests->find('all')->contain(['Users', 'InventoryItems'])
         : $this->BorrowRequests->find('all')
@@ -51,10 +73,8 @@ class BorrowRequestsController extends AppController
             ->contain(['InventoryItems']);
 
     $borrowRequests = $this->paginate($query);
-
     $this->set(compact('borrowRequests'));
 }
-
 
     // ✅ Borrower - Submit Request
     // ✅ Borrower - Submit Request
@@ -220,4 +240,13 @@ public function dashboard()
 
     $this->set(compact('borrowRequests'));
 }
+public function checkTime()
+{
+    echo "<h3>Server Time:</h3>";
+    echo date('Y-m-d H:i:s');
+    echo "<br><br><strong>Timezone used:</strong> " . date_default_timezone_get();
+    phpinfo(); // Show all PHP config (scroll to 'date' section)
+    exit;
+}
+
 }

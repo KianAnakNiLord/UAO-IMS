@@ -1,5 +1,7 @@
 <?php
 declare(strict_types=1);
+date_default_timezone_set('Asia/Manila');
+ini_set('date.timezone', 'Asia/Manila');
 
 /**
  * CakePHP(tm) : Rapid Development Framework (https://cakephp.org)
