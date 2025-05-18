@@ -1,13 +1,18 @@
 body {
     margin: 0;
     font-family: 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 .layout {
     display: flex;
-    height: 100vh;
+    min-height: 100vh; /* Ensures sidebar stretches full height */
+    flex: 1;
 }
 
+/* Sidebar */
 .sidebar {
     width: 240px;
     background-color: #3A53A4;

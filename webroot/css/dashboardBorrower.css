@@ -1,59 +1,108 @@
+/* ================================
+   🧾 Borrower Dashboard Styling
+   ================================ */
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f2f4f8;
+    margin: 0;
+    padding: 0;
+}
+
 .dashboard-container {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 30px;
-    background-color: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 40px;
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
     color: #3A53A4;
-    font-family: Arial, sans-serif;
 }
 
 .dashboard-container h1 {
     color: #B99433;
     text-align: center;
-    margin-bottom: 30px;
+    font-size: 32px;
+    margin-bottom: 25px;
+    font-weight: 700;
 }
 
+.greeting {
+    text-align: center;
+    font-size: 18px;
+    color: #3A53A4;
+    margin-bottom: 35px;
+    font-weight: 500;
+}
+
+/* Section Styling */
 .section {
-    margin-bottom: 30px;
+    margin-bottom: 35px;
+    padding: 25px;
+    border-radius: 10px;
+    background: #f9f9fc;
+    border-left: 6px solid #B99433;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
 }
 
 .section h2 {
     color: #3A53A4;
-    border-bottom: 2px solid #B99433;
-    padding-bottom: 5px;
+    font-size: 20px;
     margin-bottom: 15px;
+}
+
+/* Lists and Content */
+.section p {
+    font-size: 15px;
+    line-height: 1.7;
+}
+
+.section ol {
+    padding-left: 22px;
+    font-size: 15px;
+    line-height: 1.7;
+}
+
+.section ol li::marker {
+    color: #B99433;
+    font-weight: bold;
 }
 
 .uao-image img {
     max-width: 100%;
-    border-radius: 8px;
-    border: 1px solid #ccc;
+    border-radius: 10px;
+    border: 2px solid #ddd;
+    margin-top: 15px;
 }
 
-.instructions ol {
-    padding-left: 20px;
-    line-height: 1.6;
-}
-
-.btn.logout {
-    background-color: #3A53A4;
-    color: white;
-    padding: 10px 16px;
-    text-decoration: none;
-    border-radius: 5px;
-    display: inline-block;
-}
-
-.btn.logout:hover {
-    background-color: #2f418a;
-}
+/* Contact Links */
 .uao-contact a {
     color: #3A53A4;
     text-decoration: underline;
+    font-weight: 500;
 }
 
 .uao-contact a:hover {
     color: #2f418a;
+    text-decoration: none;
+}
+
+/* Logout Button Section */
+.section.logout {
+    text-align: center;
+    margin-top: 40px;
+}
+
+.btn.logout {
+    background-color: #dc3545;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.btn.logout:hover {
+    background-color: #c82333;
 }

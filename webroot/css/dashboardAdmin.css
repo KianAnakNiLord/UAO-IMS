@@ -1,65 +1,121 @@
+/* ===============================
+   🎯 Admin Dashboard Styling
+   =============================== */
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f2f4f8;
+    margin: 0;
+    padding: 0;
+}
+
 .admin-dashboard {
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 30px;
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 40px;
     background: white;
-    border-radius: 10px;
-    font-family: Arial, sans-serif;
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
     color: #3A53A4;
 }
 
 .admin-dashboard h1 {
     color: #B99433;
     text-align: center;
-    margin-bottom: 20px;
+    font-size: 32px;
+    margin-bottom: 25px;
+    font-weight: 700;
 }
 
 .welcome {
     text-align: center;
-    margin-bottom: 30px;
     font-size: 18px;
+    color: #3A53A4;
+    margin-bottom: 35px;
+    font-weight: 500;
 }
 
+/* Info Box & Others */
 .info-box, .shortcuts, .upcoming, .notes {
-    margin-bottom: 30px;
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background: #f9f9f9;
+    margin-bottom: 35px;
+    padding: 25px;
+    border-radius: 10px;
+    background: #f9f9fc;
+    border-left: 6px solid #B99433;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
 }
 
-.info-box ul, .notes ul {
-    padding-left: 20px;
+.info-box h2,
+.shortcuts h2,
+.upcoming h2,
+.notes h2 {
+    color: #3A53A4;
+    font-size: 20px;
+    margin-bottom: 15px;
 }
 
+.info-box ul,
+.notes ul,
+.upcoming ul {
+    padding-left: 22px;
+    line-height: 1.7;
+    font-size: 15px;
+}
+
+/* Shortcuts Section */
 .shortcuts .buttons {
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 14px;
 }
 
 .btn.shortcut {
     background-color: #3A53A4;
     color: white;
-    padding: 10px 14px;
-    border-radius: 6px;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 500;
     text-decoration: none;
+    box-shadow: 0 4px 10px rgba(58, 83, 164, 0.15);
+    transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .btn.shortcut:hover {
     background-color: #2f418a;
+    transform: translateY(-1px);
 }
 
+/* Return List Items */
+.upcoming ul li {
+    font-size: 15px;
+    margin-bottom: 8px;
+}
+
+.upcoming ul li strong {
+    color: #B99433;
+}
+
+/* Notes */
+.notes ul li::before {
+    content: '📌';
+    margin-right: 8px;
+}
+
+/* Logout Button */
 .logout-link {
     text-align: center;
+    margin-top: 30px;
 }
 
 .btn.logout {
     background-color: #dc3545;
     color: white;
-    padding: 10px 14px;
+    padding: 12px 20px;
     border-radius: 6px;
+    font-weight: bold;
     text-decoration: none;
+    transition: background-color 0.3s ease;
 }
 
 .btn.logout:hover {

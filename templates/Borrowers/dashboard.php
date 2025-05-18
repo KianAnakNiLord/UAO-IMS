@@ -38,7 +38,4 @@
         </ol>
     </div>
 
-    <div class="section logout">
-        <?= $this->Html->link('Logout', ['controller' => 'Users', 'action' => 'logout'], ['class' => 'btn logout']) ?>
-    </div>
 </div>
