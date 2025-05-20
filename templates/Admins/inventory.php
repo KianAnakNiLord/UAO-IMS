@@ -1,4 +1,3 @@
-<!-- templates/Admins/inventory.php -->
 <?= $this->Html->css('inventory') ?>
 
 <div class="inventory-header">
@@ -13,6 +12,7 @@
     <?= $this->Form->create(null, ['type' => 'get']) ?>
     <fieldset>
         <legend>Filter Inventory</legend>
+
         <?= $this->Form->control('category', [
             'label' => 'Category',
             'options' => [
@@ -35,6 +35,19 @@
             'default' => $this->request->getQuery('condition')
         ]) ?>
 
+        <?= $this->Form->control('location', [ // ✅ Location filter added
+            'label' => 'Location',
+            'options' => [
+                '' => 'All',
+                'UA Office' => 'UA Office',
+                'Covered Court' => 'Covered Court',
+                'Covered Court-Green Rm' => 'Covered Court-Green Rm',
+                'UAO-Storage' => 'UAO-Storage',
+                'Gym' => 'Gym'
+            ],
+            'default' => $this->request->getQuery('location')
+        ]) ?>
+
         <?= $this->Form->submit('Apply Filters') ?>
     </fieldset>
     <?= $this->Form->end() ?>
@@ -47,6 +60,7 @@
             <th>Category</th>
             <th>Condition</th>
             <th>Quantity</th>
+            <th>Location</th>
             <th>Procurement Date</th>
             <th>Description</th>
             <th>Actions</th>
@@ -58,29 +72,29 @@
             <td><?= h($item->name) ?></td>
             <td><?= h(ucwords(str_replace('_', ' ', $item->category))) ?></td>
             <td>
-    <?php
-        $condition = strtolower($item->item_condition);
-        $conditionClass = match ($condition) {
-            'new' => 'condition-new',
-            'used' => 'condition-used',
-            'damaged' => 'condition-damaged',
-            default => ''
-        };
-    ?>
-    <span class="condition-tag <?= $conditionClass ?>">
-        <?= ucfirst(h($condition)) ?>
-    </span>
-</td>
-<td>
-    <?= h($item->quantity) ?>
-    <?php if (strtolower($item->item_condition) !== 'damaged'): ?>
-        <br>
-        <small style="color: gray;">Borrowed: <?= h($item->total_borrowed ?? 0) ?></small>
-        <br>
-        <small style="color: #cc0000;">Returned Damaged: <?= h($item->total_damaged ?? 0) ?></small>
-    <?php endif; ?>
-</td>
-
+                <?php
+                    $condition = strtolower($item->item_condition);
+                    $conditionClass = match ($condition) {
+                        'new' => 'condition-new',
+                        'used' => 'condition-used',
+                        'damaged' => 'condition-damaged',
+                        default => ''
+                    };
+                ?>
+                <span class="condition-tag <?= $conditionClass ?>">
+                    <?= ucfirst(h($condition)) ?>
+                </span>
+            </td>
+            <td>
+                <?= h($item->quantity) ?>
+                <?php if (strtolower($item->item_condition) !== 'damaged'): ?>
+                    <br>
+                    <small style="color: gray;">Borrowed: <?= h($item->total_borrowed ?? 0) ?></small>
+                    <br>
+                    <small style="color: #cc0000;">Returned Damaged: <?= h($item->total_damaged ?? 0) ?></small>
+                <?php endif; ?>
+            </td>
+            <td><?= h($item->location) ?></td>
             <td><?= h($item->procurement_date) ?></td>
             <td><?= h($item->description) ?></td>
             <td>

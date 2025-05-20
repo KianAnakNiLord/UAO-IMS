@@ -48,6 +48,22 @@
             'empty' => 'Choose condition'
         ]) ?>
 
+        <!-- ✅ New Location Dropdown -->
+        <?= $this->Form->control('location', [
+            'label' => 'Location',
+            'type' => 'select',
+            'options' => [
+                'UA Office' => 'UA Office',
+                'Covered Court' => 'Covered Court',
+                'Covered Court-Green Rm' => 'Covered Court-Green Rm',
+                'UAO-Storage' => 'UAO-Storage',
+                'Gym' => 'Gym'
+            ],
+            'default' => 'UA Office',
+            'empty' => false,
+            'required' => true
+        ]) ?>
+
         <?= $this->Form->button('Add Item', ['class' => 'inventory-btn']) ?>
         <?= $this->Form->end() ?>
 

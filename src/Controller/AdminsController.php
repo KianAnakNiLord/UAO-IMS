@@ -7,6 +7,8 @@ use Dompdf\Dompdf;
 use Dompdf\Options;
 use Cake\Mailer\Mailer;
 use Cake\Log\Log;
+use Cake\Routing\Router;
+
 /**
  * @property \App\Model\Table\BorrowRequestsTable $BorrowRequests
  * @property \App\Model\Table\UsersTable $Users
@@ -62,7 +64,7 @@ class AdminsController extends AppController
 }
 
 
-    public function inventory()
+public function inventory()
 {
     $this->InventoryItems = $this->fetchTable('InventoryItems');
     $this->BorrowRequests = $this->fetchTable('BorrowRequests');
@@ -78,6 +80,7 @@ class AdminsController extends AppController
             'InventoryItems.quantity',
             'InventoryItems.procurement_date',
             'InventoryItems.description',
+            'InventoryItems.location',
             'total_borrowed' => $query->func()->coalesce([
                 $query->func()->sum(
                     $query->newExpr()->add(['CASE WHEN BorrowRequests.status = "approved" THEN BorrowRequests.quantity_requested ELSE 0 END'])
@@ -95,6 +98,8 @@ class AdminsController extends AppController
     // Filtering
     $search = $this->request->getQuery('search');
     $category = $this->request->getQuery('category');
+    $condition = $this->request->getQuery('condition');
+    $location = $this->request->getQuery('location');
 
     if ($search) {
         $query->where(function ($exp, $q) use ($search) {
@@ -106,11 +111,17 @@ class AdminsController extends AppController
         $query->where(['InventoryItems.category' => $category]);
     }
 
+    if ($condition) {
+        $query->where(['InventoryItems.item_condition' => strtolower($condition)]);
+    }
+
+    if ($location) {
+        $query->where(['InventoryItems.location' => $location]);
+    }
+
     $inventoryItems = $this->paginate($query);
-    $this->set(compact('inventoryItems', 'search', 'category'));
+    $this->set(compact('inventoryItems', 'search', 'category', 'condition', 'location'));
 }
-
-
 
 
     public function addInventory()
@@ -433,33 +444,41 @@ public function markAsOverdue($id = null)
     return $this->redirect(['action' => 'approvedRequests']);
 }
 
-
 public function exportInventoryPdf()
 {
     $inventoryItems = $this->InventoryItems->find()->all();
-
-    // ✅ Pass $inventoryItems to the view
     $this->set(compact('inventoryItems'));
 
-    // Load view into variable
     $this->viewBuilder()->disableAutoLayout();
-    $this->viewBuilder()->setTemplate('pdf_inventory'); // refers to templates/Admins/pdf_inventory.php
-    $html = $this->render()->getBody();
+    $this->viewBuilder()->setTemplate('pdf_inventory');
 
-    // Generate PDF
-    $options = new \Dompdf\Options();
+    // ✅ Convert stream to string
+    $html = (string) $this->render()->getBody();
+
+    $options = new Options();
     $options->set('defaultFont', 'Arial');
-    $dompdf = new \Dompdf\Dompdf($options);
+    $options->set('isRemoteEnabled', true); // ✅ enable remote loading
+
+    $dompdf = new Dompdf($options);
+
+    // ✅ Fix image path from local to full URL
+    $baseUrl = Router::url('/', true);
+    $html = str_replace(
+        'src="' . WWW_ROOT . 'img/cruslogo.png"',
+        'src="' . $baseUrl . 'img/cruslogo.png"',
+        $html
+    );
+
     $dompdf->loadHtml($html);
     $dompdf->setPaper('A4', 'portrait');
     $dompdf->render();
 
-    // Output to browser
     return $this->response
         ->withType('application/pdf')
-        ->withHeader('Content-Disposition', 'attachment; filename="inventory_list.pdf"')
+        ->withHeader('Content-Disposition', 'attachment; filename="inventory_report.pdf"')
         ->withStringBody($dompdf->output());
 }
+
 
 public function beforeFilter(\Cake\Event\EventInterface $event)
 {

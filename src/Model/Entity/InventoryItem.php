@@ -37,5 +37,6 @@ class InventoryItem extends Entity
         'created' => true,
         'modified' => true,
         'borrow_requests' => true,
+        'location' => true, // ✅ Add this
     ];
 }
