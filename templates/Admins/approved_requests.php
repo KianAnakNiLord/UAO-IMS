@@ -33,10 +33,19 @@
                 <?php endif; ?>
             </td>
             <td>
-                <div class="action-buttons">
-                    <?= $this->Html->link('Mark as Returned', ['action' => 'markAsReturned', $request->id], ['class' => 'btn mark-returned']) ?>
-                </div>
-            </td>
+    <div class="action-buttons">
+        <?= $this->Html->link('Mark as Returned', ['action' => 'markAsReturned', $request->id], ['class' => 'btn mark-returned']) ?>
+        <?php if ($request->status === 'overdue' && $request->return_date && $request->return_time): ?>
+            <?php
+                $due = new DateTime($request->return_date->format('Y-m-d') . ' ' . $request->return_time->format('H:i:s'));
+                $now = new DateTime();
+                $interval = $now->diff($due);
+                echo "<br><small style='color:red;'>Overdue by {$interval->days} days, {$interval->h} hrs, {$interval->i} min</small>";
+            ?>
+        <?php endif; ?>
+    </div>
+</td>
+
         </tr>
         <?php endforeach; ?>
     </tbody>

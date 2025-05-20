@@ -67,10 +67,8 @@ class AdminsController extends AppController
     $this->InventoryItems = $this->fetchTable('InventoryItems');
     $this->BorrowRequests = $this->fetchTable('BorrowRequests');
 
-    // Base query
     $query = $this->InventoryItems->find();
 
-    // Join and aggregate only approved borrow requests
     $query = $query
         ->select([
             'InventoryItems.id',
@@ -81,12 +79,17 @@ class AdminsController extends AppController
             'InventoryItems.procurement_date',
             'InventoryItems.description',
             'total_borrowed' => $query->func()->coalesce([
-                $query->func()->sum('BorrowRequests.quantity_requested'), 0
+                $query->func()->sum(
+                    $query->newExpr()->add(['CASE WHEN BorrowRequests.status = "approved" THEN BorrowRequests.quantity_requested ELSE 0 END'])
+                ), 0
+            ]),
+            'total_damaged' => $query->func()->coalesce([
+                $query->func()->sum(
+                    $query->newExpr()->add(['CASE WHEN BorrowRequests.status = "returned" THEN BorrowRequests.returned_damaged ELSE 0 END'])
+                ), 0
             ])
         ])
-        ->leftJoinWith('BorrowRequests', function ($q) {
-            return $q->where(['BorrowRequests.status' => 'approved']);
-        })
+        ->leftJoinWith('BorrowRequests')
         ->group(['InventoryItems.id']);
 
     // Filtering
@@ -106,6 +109,7 @@ class AdminsController extends AppController
     $inventoryItems = $this->paginate($query);
     $this->set(compact('inventoryItems', 'search', 'category'));
 }
+
 
 
 
@@ -344,8 +348,6 @@ public function rejectRequest($id = null)
     $this->set(compact('approvedRequests'));
 }
 
-
-
 public function markAsReturned($id = null)
 {
     $user = $this->request->getAttribute('identity');
@@ -358,35 +360,55 @@ public function markAsReturned($id = null)
 
     if ($this->request->is(['post', 'put'])) {
         $data = $this->request->getData();
-        $returnedQty = (int)$data['returned_quantity'];
+        $returnedGood = (int)$data['returned_quantity'];
+        $returnedDamaged = (int)$data['damaged_quantity'];
 
-        // Clamp value to not exceed requested
-        $returnedQty = min($returnedQty, $request->quantity_requested);
-        $damagedQty = $request->quantity_requested - $returnedQty;
+        $totalReturned = $returnedGood + $returnedDamaged;
 
-        // Update return remark with summary
+        // Clamp to not exceed what was borrowed
+        if ($totalReturned > $request->quantity_requested) {
+            $this->Flash->error('Total returned quantity exceeds what was borrowed.');
+            return $this->redirect(['action' => 'markAsReturned', $id]);
+        }
+
         $request->status = 'returned';
-        $request->return_remark = "Returned: {$returnedQty} good" . ($damagedQty > 0 ? ", {$damagedQty} damaged" : "");
+        $request->returned_good = $returnedGood;
+        $request->returned_damaged = $returnedDamaged;
+        $request->return_remark = "Returned: {$returnedGood} good" . ($returnedDamaged > 0 ? ", {$returnedDamaged} damaged" : "");
 
         $inventoryTable = $this->fetchTable('InventoryItems');
         $item = $inventoryTable->get($request->inventory_item_id);
-        $item->quantity += $returnedQty;
+        $item->quantity += $returnedGood; // only increase inventory with good items
         $item->setDirty('quantity', true);
 
         if (
             $this->BorrowRequests->save($request) &&
             $inventoryTable->save($item)
         ) {
-            $this->Flash->success("Marked as returned. {$returnedQty} added to inventory.");
+            $this->Flash->success("Marked as returned. Inventory updated with {$returnedGood} good item(s).");
         } else {
-            $this->Flash->error("Could not update inventory or borrow request.");
+            $this->Flash->error("Failed to update inventory or borrow request.");
         }
+
+        if (
+    !$this->BorrowRequests->save($request)
+) {
+    $this->Flash->error("Borrow request save failed: " . json_encode($request->getErrors()));
+    return $this->redirect(['action' => 'approvedRequests']);
+}
+
+if (!$inventoryTable->save($item)) {
+    $this->Flash->error("Inventory save failed: " . json_encode($item->getErrors()));
+    return $this->redirect(['action' => 'approvedRequests']);
+}
+
 
         return $this->redirect(['action' => 'approvedRequests']);
     }
 
     $this->set(compact('request'));
 }
+
 
 public function markAsOverdue($id = null)
 {
@@ -472,35 +494,40 @@ private function autoMarkOverdue(): void
 
     $requests = $this->BorrowRequests->find()
         ->contain(['Users', 'InventoryItems'])
-        ->where(['status IN' => ['approved', 'pending']])
+        ->where(['status IN' => ['approved']])
         ->all();
 
     foreach ($requests as $request) {
-        if ($request->return_date && $request->return_time) {
-            $due = new \DateTime($request->return_date->format('Y-m-d') . ' ' . $request->return_time->format('H:i:s'));
+        if (
+            $request->status !== 'approved' || // ✅ Extra safety
+            !$request->return_date || 
+            !$request->return_time
+        ) {
+            continue;
+        }
 
-            if ($now > $due && $request->status !== 'overdue') {
-                $request->status = 'overdue';
-                $request->return_remark = 'Automatically marked overdue by system';
+        $due = new \DateTime($request->return_date->format('Y-m-d') . ' ' . $request->return_time->format('H:i:s'));
 
-                if ($this->BorrowRequests->save($request)) {
-                    // Send email if user and item info exist
-                    if ($request->user && $request->inventory_item) {
-                        $user = $request->user;
-                        $item = $request->inventory_item;
+        if ($now > $due && $request->status !== 'overdue') {
+            $request->status = 'overdue';
+            $request->return_remark = 'Automatically marked overdue by system';
 
-                        $mailer = new Mailer('default');
-                        $mailer->setFrom(['noreply@uao-ims.test' => 'UAO IMS'])
-                            ->setTo($user->email)
-                            ->setSubject('Borrow Request Overdue')
-                            ->deliver(
-                                "Hello {$user->name},\n\n" .
-                                "Your borrow request for \"{$item->name}\" is now marked as OVERDUE.\n\n" .
-                                "Return Due: {$request->return_date->format('Y-m-d')} at {$request->return_time->format('H:i')}\n\n" .
-                                "Please return the item immediately to avoid any further issues.\n\n" .
-                                "Thank you,\nUAO Inventory Team"
-                            );
-                    }
+            if ($this->BorrowRequests->save($request)) {
+                if ($request->user && $request->inventory_item) {
+                    $user = $request->user;
+                    $item = $request->inventory_item;
+
+                    (new Mailer('default'))
+                        ->setFrom(['noreply@uao-ims.test' => 'UAO IMS'])
+                        ->setTo($user->email)
+                        ->setSubject('Borrow Request Overdue')
+                        ->deliver(
+                            "Hello {$user->name},\n\n" .
+                            "Your borrow request for \"{$item->name}\" is now marked as OVERDUE.\n\n" .
+                            "Return Due: {$request->return_date->format('Y-m-d')} at {$request->return_time->format('H:i')}\n\n" .
+                            "Please return the item immediately to avoid any further issues.\n\n" .
+                            "Thank you,\nUAO Inventory Team"
+                        );
                 }
             }
         }

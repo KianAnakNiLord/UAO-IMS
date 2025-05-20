@@ -45,5 +45,7 @@ class BorrowRequest extends Entity
         'inventory_item' => true,
         'return_time' => true, // Make sure return_time is included here
         'id_image' => true,
+            'returned_good' => true,
+    'returned_damaged' => true,
     ];
 }

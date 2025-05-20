@@ -71,12 +71,16 @@
         <?= ucfirst(h($condition)) ?>
     </span>
 </td>
+<td>
+    <?= h($item->quantity) ?>
+    <?php if (strtolower($item->item_condition) !== 'damaged'): ?>
+        <br>
+        <small style="color: gray;">Borrowed: <?= h($item->total_borrowed ?? 0) ?></small>
+        <br>
+        <small style="color: #cc0000;">Returned Damaged: <?= h($item->total_damaged ?? 0) ?></small>
+    <?php endif; ?>
+</td>
 
-            <td>
-                <?= h($item->quantity) ?>
-                <br>
-                <small style="color: gray;">Borrowed: <?= h($item->total_borrowed ?? 0) ?></small>
-            </td>
             <td><?= h($item->procurement_date) ?></td>
             <td><?= h($item->description) ?></td>
             <td>

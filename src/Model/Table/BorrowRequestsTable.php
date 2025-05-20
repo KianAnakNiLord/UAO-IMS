@@ -107,11 +107,15 @@ class BorrowRequestsTable extends Table
     $rules->add($rules->existsIn(['user_id'], 'Users'), ['errorField' => 'user_id']);
     $rules->add($rules->existsIn(['inventory_item_id'], 'InventoryItems'), ['errorField' => 'inventory_item_id']);
 
-    // ✅ Step 2: Ensure requested quantity does not exceed available inventory
+    // ✅ Only run this rule when adding a new borrow request
     $rules->add(function ($entity, $options) {
-        $inventoryTable = $this->getAssociation('InventoryItems')->getTarget();
-        $item = $inventoryTable->get($entity->inventory_item_id);
-        return $entity->quantity_requested <= $item->quantity;
+        // Only validate on NEW requests
+        if ($entity->isNew()) {
+            $inventoryTable = $this->getAssociation('InventoryItems')->getTarget();
+            $item = $inventoryTable->get($entity->inventory_item_id);
+            return $entity->quantity_requested <= $item->quantity;
+        }
+        return true;
     }, 'enoughQuantity', [
         'errorField' => 'quantity_requested',
         'message' => 'Requested quantity exceeds available inventory.'
@@ -119,5 +123,6 @@ class BorrowRequestsTable extends Table
 
     return $rules;
 }
+
 
 }

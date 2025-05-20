@@ -93,10 +93,13 @@
 <!-- ✅ Filter inventory items by category -->
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    // ✅ Category Filter Functionality
     const categoryFilter = document.getElementById('categoryFilter');
     const inventorySelect = document.getElementById('inventorySelect');
+    const requestDateInput = document.getElementById('request-date');
+    const returnDateInput = document.getElementById('return-date');
+    const returnTimeInput = document.getElementById('return-time');
 
+    // ✅ Filter inventory items by category
     categoryFilter.addEventListener('change', function () {
         const selectedCategory = this.value;
 
@@ -113,13 +116,30 @@ document.addEventListener('DOMContentLoaded', function () {
         inventorySelect.selectedIndex = 0;
     });
 
-    // ✅ Prevent selecting past dates for request/return
+    // ✅ Set minimum dates to today
     const today = new Date().toISOString().split('T')[0];
-    const requestDateInput = document.getElementById('request-date');
-    const returnDateInput = document.getElementById('return-date');
-
     if (requestDateInput) requestDateInput.setAttribute('min', today);
     if (returnDateInput) returnDateInput.setAttribute('min', today);
+
+    // ✅ Time validation when return date is today
+    returnDateInput?.addEventListener('change', validateTimeLimit);
+    returnTimeInput?.addEventListener('change', validateTimeLimit);
+
+    function validateTimeLimit() {
+        const returnDate = returnDateInput?.value;
+        const returnTime = returnTimeInput?.value;
+
+        if (!returnDate || !returnTime) return;
+
+        const now = new Date();
+        const selected = new Date(`${returnDate}T${returnTime}`);
+
+        if (selected <= now) {
+            alert("Return time must be in the future.");
+            returnTimeInput.value = '';
+        }
+    }
 });
 </script>
+
 

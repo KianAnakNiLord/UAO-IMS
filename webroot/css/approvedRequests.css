@@ -21,7 +21,11 @@ table th {
 
 table td {
     background-color: #f9f9f9;
+    vertical-align: middle; /* Ensures text and buttons are aligned properly */
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
+    
 
 h1 {
     color: #3A53A4;
@@ -52,19 +56,31 @@ form button:hover {
     background-color: #2f418a;
 }
 
-/* Green - Mark as Returned Button */
+/* Gold - Mark as Returned Button */
 .btn.mark-returned {
-    background-color: #28a745;
+    background-color: #B99433;
     color: white;
-    padding: 6px 12px;
-    border-radius: 4px;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 600;
     text-decoration: none;
+    display: inline-block;
     transition: background-color 0.3s ease;
 }
 
 .btn.mark-returned:hover {
-    background-color: #218838;
+    background-color: #967a28;
 }
+
+/* Overdue message styling */
+.overdue-text {
+    font-size: 13px;
+    color: #cc0000;
+    margin-top: 6px;
+    font-weight: 500;
+    display: inline-block;
+}
+
 
 /* Red - Mark as Overdue Button */
 .btn.mark-overdue {
@@ -84,6 +100,10 @@ form button:hover {
 .action-buttons {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    align-items: flex-start;
+    align-items: center; /* Center within the td */
+    gap: 6px;
+    max-width: 100%;          /* Prevent overflow */
+    word-wrap: break-word;
+    box-sizing: border-box;
 }
+
