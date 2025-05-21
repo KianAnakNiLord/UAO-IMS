@@ -55,17 +55,21 @@ class UsersTable extends Table
         'message' => 'Please use a valid XU email (e.g., 20220000000@my.xu.edu.ph).'
     ]);
 
-        $validator
+       $validator
     ->scalar('password')
     ->maxLength('password', 255)
-    ->requirePresence('password', 'create')
-    ->notEmptyString('password')
+    ->allowEmptyString('password', 'Password can be empty for social login.')
     ->add('password', 'strength', [
         'rule' => function ($value, $context) {
+            // Only validate strength if password is provided
+            if (empty($value)) {
+                return true;
+            }
             return (bool)preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/', (string)$value);
         },
         'message' => 'Password must be at least 8 characters and include a number, a lowercase and an uppercase letter.'
     ]);
+
 
 
 
@@ -93,5 +97,109 @@ class UsersTable extends Table
     ]);
 }
     
+    // 1. In your UsersTable.php
+public function findOrCreateFromSocial($data)
+{
+    $socialProfilesTable = \Cake\ORM\TableRegistry::getTableLocator()->get('SocialProfiles');
+    \Cake\Log\Log::write('error', '🔍 findOrCreateFromSocial() START for ' . json_encode($data));
+
+    // ✅ Domain restriction
+    if (!str_ends_with($data['email'], '@my.xu.edu.ph')) {
+        throw new \RuntimeException('Only @my.xu.edu.ph emails are allowed.');
+    }
+
+    $provider = strtolower($data['provider'] ?? 'google');
+    $identifier = (string)($data['identifier'] ?? '');
+
+    if (!$identifier) {
+        throw new \RuntimeException('Missing social profile identifier.');
+    }
+
+    $name = $data['name']
+        ?? $data['full_name']
+        ?? trim(($data['first_name'] ?? '') . ' ' . ($data['last_name'] ?? ''))
+        ?: 'Unnamed';
+
+    \Cake\Log\Log::write('error', "➡️ Looking for user: {$data['email']}");
+    $user = $this->find()->where(['email' => $data['email']])->first();
+
+    if (!$user) {
+        \Cake\Log\Log::write('error', "👤 Creating new user for: {$data['email']}");
+        $user = $this->newEntity([
+            'email' => $data['email'],
+            'name' => $name,
+            'role' => 'borrower',
+            'is_verified' => true,
+        ]);
+        $this->saveOrFail($user);
+    } elseif ($user->name === 'Unnamed' && $name !== 'Unnamed') {
+        \Cake\Log\Log::write('error', "✏️ Updating placeholder user name to: $name");
+        $user->name = $name;
+        $this->save($user);
+    }
+
+    \Cake\Log\Log::write('error', "🔍 Checking for existing social profile: $provider - $identifier");
+
+    $existingProfile = $socialProfilesTable->find()
+        ->where(['provider' => $provider, 'identifier' => $identifier])
+        ->first();
+
+    if ($existingProfile) {
+        \Cake\Log\Log::write('error', "🔁 Updating existing profile for $identifier");
+
+        $existingProfile = $socialProfilesTable->patchEntity($existingProfile, [
+            'user_id' => $user->id,
+            'email' => $data['email'],
+            'full_name' => $name,
+            'first_name' => $data['first_name'] ?? null,
+            'last_name' => $data['last_name'] ?? null,
+            'profile_url' => $data['profile_url'] ?? null,
+            'image_url' => $data['image_url'] ?? null,
+            'raw_data' => json_encode($data),
+        ]);
+        $socialProfilesTable->save($existingProfile);
+        return $user;
+    }
+
+    \Cake\Log\Log::write('error', "✅ Creating NEW social profile for $identifier");
+
+    $socialProfile = $socialProfilesTable->newEntity([
+        'user_id' => $user->id,
+        'provider' => $provider,
+        'identifier' => $identifier,
+        'email' => $data['email'],
+        'full_name' => $name,
+        'first_name' => $data['first_name'] ?? null,
+        'last_name' => $data['last_name'] ?? null,
+        'profile_url' => $data['profile_url'] ?? null,
+        'image_url' => $data['image_url'] ?? null,
+        'raw_data' => json_encode($data),
+    ]);
+
+    try {
+        $socialProfilesTable->saveOrFail($socialProfile);
+    } catch (\Cake\ORM\Exception\PersistenceFailedException $e) {
+        // 🛑 Log and retry in case of race condition
+        \Cake\Log\Log::write('warning', "⚠️ Race condition: profile likely inserted by parallel request. Retrying lookup...");
+
+        $existingProfile = $socialProfilesTable->find()
+            ->where(['provider' => $provider, 'identifier' => $identifier])
+            ->first();
+
+        if ($existingProfile) {
+            \Cake\Log\Log::write('error', "✅ Found profile after failed insert for $identifier");
+            return $user;
+        }
+
+        // 🔥 Rethrow if truly failed
+        \Cake\Log\Log::write('error', "❌ Insert and fallback both failed: " . $e->getMessage());
+        throw $e;
+    } catch (\Exception $e) {
+        \Cake\Log\Log::write('error', "❌ General insert error: " . $e->getMessage());
+        throw $e;
+    }
+
+    return $user;
+}
 
 }

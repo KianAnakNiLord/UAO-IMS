@@ -1,50 +1,143 @@
 <div class="login-wrapper">
     <div class="login-card">
-        <h1 class="login-title">Welcome to UAO-IMS</h1>
 
-        <?= $this->Form->create() ?>
-            <?= $this->Form->control('email', [
-                'label' => 'Email Address',
-                'placeholder' => 'e.g. yourname@xu.edu.ph',
-                'class' => 'form-control'
-            ]) ?>
+        <!-- 🔰 Logo -->
+        <div class="login-logo">
+            <img src="<?= $this->Url->image('cruslogo.png') ?>" class="logo" alt="UAO Logo">
+        </div>
 
-<div class="password-wrapper">
-    <label for="passwordInput">Password</label>
-    <input type="password" name="password" id="passwordInput" class="form-control" placeholder="Enter your password">
-    <span id="togglePassword" class="toggle-password">
-        <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#3A53A4" viewBox="0 0 16 16">
-            <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zm-8 4a4 4 0 1 1 0-8 4 4 0 0 1 0 8z"/>
-            <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z"/>
-        </svg>
-    </span>
-</div>
+        <!-- 🔷 Title -->
+        <h1 class="login-title">
+            Welcome to <span class="highlight">UAO-IMS</span>
+        </h1>
 
+        <!-- 📎 Subtext -->
+        <p class="login-subtext">
+            Access the system using your <strong>@my.xu.edu.ph</strong> account
+        </p>
 
-            <?= $this->Form->button('Login', ['class' => 'login-btn']) ?>
-        <?= $this->Form->end() ?>
+        <!-- 🔐 Google Login -->
+        <?= $this->Html->link(
+            'Login with Google',
+            ['plugin' => 'ADmad/SocialAuth', 'controller' => 'Auth', 'action' => 'login', 'google'],
+            ['class' => 'login-btn']
+        ) ?>
+
+        <!-- 📝 Footer -->
+        <div class="login-footer">
+            <p>© <?= date('Y') ?> University Athletics Office - Xavier University</p>
+        </div>
     </div>
 </div>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const passwordInput = document.getElementById("passwordInput");
-        const toggleIcon = document.getElementById("togglePassword");
-        let eyeVisible = true;
+<style>
+    /* 🔵 Layout */
+    .login-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background-color: #f0f2f8;
+        padding: 20px;
+    }
 
-        toggleIcon.addEventListener("click", function () {
-            const type = passwordInput.type === "password" ? "text" : "password";
-            passwordInput.type = type;
-            eyeVisible = !eyeVisible;
-            toggleIcon.innerHTML = eyeVisible
-                ? `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="#3A53A4" viewBox="0 0 16 16">
-                     <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zm-8 4a4 4 0 1 1 0-8 4 4 0 0 1 0 8z"/>
-                     <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z"/>
-                   </svg>`
-                : `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="#3A53A4" viewBox="0 0 16 16">
-                     <path d="M13.359 11.238C14.417 10.074 15 8.777 15 8s-.583-2.074-1.641-3.238C12.3 3.602 10.287 2.5 8 2.5c-.97 0-1.906.176-2.758.484l1.47 1.47A4.5 4.5 0 0 1 12.5 8c0 .818-.246 1.578-.667 2.21l1.526 1.528z"/>
-                     <path d="M2.854 2.146a.5.5 0 1 0-.708.708l1.311 1.311A9.77 9.77 0 0 0 1 8s3 5.5 7 5.5a7.24 7.24 0 0 0 2.566-.474l1.08 1.08a.5.5 0 0 0 .708-.708l-10-10zM5.682 5.682l1.312 1.312A1.5 1.5 0 0 0 8 9.5c.333 0 .643-.105.9-.282l1.24 1.24A4.5 4.5 0 0 1 4.5 8c0-.736.184-1.43.504-2.04z"/>
-                   </svg>`;
-        });
-    });
-</script>
+    .login-card {
+        background: white;
+        padding: 60px 40px;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+        max-width: 420px;
+        width: 100%;
+        text-align: center;
+        animation: fadeIn 0.6s ease-out;
+    }
+
+    /* 🖼️ Logo */
+    .login-logo {
+        margin-bottom: 30px;
+    }
+
+    .login-logo img {
+        max-height: 90px;
+        display: block;
+        margin: 0 auto;
+    }
+
+    /* 🏫 Title and Subtext */
+    .login-title {
+        font-size: 26px;
+        font-weight: 700;
+        margin-bottom: 10px;
+        color: #3A53A4;
+    }
+
+    .highlight {
+        color: #B99433;
+    }
+
+    .login-subtext {
+        font-size: 15px;
+        color: #555;
+        margin-bottom: 35px;
+    }
+
+    /* 🔘 Login Button */
+    .login-btn {
+        background-color: white;
+        border: 2px solid #3A53A4;
+        color: #3A53A4;
+        padding: 14px;
+        font-size: 15px;
+        font-weight: 600;
+        border-radius: 8px;
+        display: inline-block;
+        width: 100%;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        margin-left: -15px; /* tweak value as needed */
+        box-shadow: 0 2px 6px rgba(58, 83, 164, 0.1);
+    }
+
+    .login-btn:hover {
+        background-color: #3A53A4;
+        color: white;
+    }
+
+    /* 📌 Footer */
+    .login-footer {
+        margin-top: 40px;
+        font-size: 12px;
+        color: #999;
+    }
+
+    /* ✨ Animations */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* 📱 Mobile responsiveness */
+    @media (max-width: 500px) {
+        .login-card {
+            padding: 40px 25px;
+        }
+
+        .login-title {
+            font-size: 22px;
+        }
+
+        .login-btn {
+            font-size: 14px;
+        }
+
+        .login-logo img {
+            max-height: 75px;
+        }
+    }
+</style>

@@ -5,6 +5,25 @@ use Cake\Routing\RouteBuilder;
 return function (RouteBuilder $routes): void {
     $routes->setRouteClass(DashedRoute::class);
 
+    // ✅ SocialAuth plugin routes (Google login and callback) with GET + POST allowed
+    $routes->scope('/auth', ['plugin' => 'ADmad/SocialAuth'], function (RouteBuilder $builder): void {
+    $builder->connect(
+        '/login/{provider}',                        // ✅ accepts /auth/login/Google
+        ['controller' => 'Auth', 'action' => 'login'],
+        ['pass' => ['provider']]                   // ✅ passes 'Google' to the controller
+    );
+
+    $builder->connect(
+        '/callback/{provider}',
+        ['controller' => 'Auth', 'action' => 'callback'],
+        ['pass' => ['provider']]
+    );
+});
+
+
+
+
+
     $routes->scope('/', function (RouteBuilder $builder): void {
         // Default route - redirect to login
         $builder->connect('/', ['controller' => 'Users', 'action' => 'login']);

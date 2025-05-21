@@ -32,7 +32,9 @@ class UsersController extends AppController
         parent::beforeFilter($event);
 
         // Allow non-authenticated users to access login and register
-        $this->Authentication->addUnauthenticatedActions(['login', 'register','logtest', 'verifyOtp']);
+        $this->Authentication->addUnauthenticatedActions([
+    'login', 'register', 'verifyOtp', 'googleLogin', 'googleLoginCallback', 'logtest'
+]);
     }
 
 
@@ -232,6 +234,23 @@ public function verifyOtp($userId = null)
 
     $this->set(compact('user'));
 }
+public function socialLogin($provider = null)
+{
+    // Log incoming request data (for debugging)
+    $this->log($this->request->getData(), 'debug');
+    $this->log($this->request->getQuery(), 'debug');
 
+    // Continue with your logic
+    $result = $this->Authentication->getResult();
+
+    if ($result->isValid()) {
+        // Redirect to dashboard or homepage
+        return $this->redirect($this->Authentication->getLoginRedirect() ?? '/');
+    }
+
+    // If failed
+    $this->Flash->error('Social login failed. Please try again.');
+    return $this->redirect(['action' => 'login']);
+}
 }
 

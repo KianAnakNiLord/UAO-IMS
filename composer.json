@@ -6,6 +6,7 @@
     "homepage": "https://cakephp.org",
     "require": {
         "php": ">=8.1",
+        "admad/cakephp-social-auth": "^2.1",
         "cakephp/authentication": "^3.2",
         "cakephp/cakephp": "^5.2",
         "cakephp/chronos": "^3.1",

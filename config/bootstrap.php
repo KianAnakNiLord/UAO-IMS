@@ -172,9 +172,9 @@ if (!$fullBaseUrl) {
     }
     unset($httpHost, $s);
 }
-if ($fullBaseUrl) {
-    Router::fullBaseUrl($fullBaseUrl);
-}
+//if ($fullBaseUrl) {
+  //  Router::fullBaseUrl($fullBaseUrl);
+//}
 unset($fullBaseUrl);
 
 /*
