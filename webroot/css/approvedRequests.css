@@ -1,78 +1,110 @@
 /* ===============================
-   Approved Requests Page Styles
+   ✅ Approved Requests – Xavier Theme
    =============================== */
 
-table {
+body {
+    background-color: #f5f7fa;
+    font-family: "Segoe UI", sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* Page Container */
+.approved-requests-container {
+    max-width: 1300px;
+    margin: 40px auto;
+    padding: 40px;
+    background-color: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+    border-top: 6px solid #B99433;
+}
+
+/* Header */
+.approved-requests-container h1 {
+    color: #3A53A4;
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 30px;
+    border-left: 6px solid #B99433;
+    padding-left: 15px;
+}
+
+/* Table Styling */
+.approved-requests-table {
     width: 100%;
     border-collapse: collapse;
+    background-color: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
     margin-bottom: 30px;
 }
 
-table th, table td {
-    padding: 12px;
+.approved-requests-table thead {
+    background: linear-gradient(to right, #3A53A4, #2f418a);
+    color: white;
+}
+
+.approved-requests-table th {
+    padding: 14px;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
     text-align: left;
-    border: 1px solid #ddd;
 }
 
-table th {
-    background-color: #3A53A4;
-    color: white;
+.approved-requests-table td {
+    padding: 14px;
+    font-size: 14px;
+    border-bottom: 1px solid #e0e0e0;
+    color: #333;
+    vertical-align: middle;
 }
 
-table td {
-    background-color: #f9f9f9;
-    vertical-align: middle; /* Ensures text and buttons are aligned properly */
-    overflow-wrap: break-word;
-    word-break: break-word;
-}
-    
-
-h1 {
-    color: #3A53A4;
+.approved-requests-table tr:last-child td {
+    border-bottom: none;
 }
 
-form {
-    margin-top: 20px;
-}
-
-form select {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    margin-bottom: 10px;
-}
-
-form button {
-    background-color: #3A53A4;
-    color: white;
-    padding: 10px;
-    border-radius: 6px;
-    border: none;
-    cursor: pointer;
-}
-
-form button:hover {
-    background-color: #2f418a;
-}
-
-/* Gold - Mark as Returned Button */
+/* Mark as Returned Button (Gold) */
 .btn.mark-returned {
     background-color: #B99433;
     color: white;
-    padding: 8px 16px;
-    border-radius: 6px;
+    padding: 10px 16px;
+    font-size: 14px;
     font-weight: 600;
-    text-decoration: none;
-    display: inline-block;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
     transition: background-color 0.3s ease;
+    text-align: center;
+    text-decoration: none;
 }
 
 .btn.mark-returned:hover {
     background-color: #967a28;
 }
 
-/* Overdue message styling */
+/* Mark as Overdue Button (Red) */
+.btn.mark-overdue {
+    background-color: #dc3545;
+    color: white;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-align: center;
+    text-decoration: none;
+}
+
+.btn.mark-overdue:hover {
+    background-color: #c82333;
+}
+
+/* Overdue Text */
 .overdue-text {
     font-size: 13px;
     color: #cc0000;
@@ -81,29 +113,10 @@ form button:hover {
     display: inline-block;
 }
 
-
-/* Red - Mark as Overdue Button */
-.btn.mark-overdue {
-    background-color: #dc3545;
-    color: white;
-    padding: 6px 12px;
-    border-radius: 4px;
-    text-decoration: none;
-    transition: background-color 0.3s ease;
-}
-
-.btn.mark-overdue:hover {
-    background-color: #c82333;
-}
-
-/* Stack Action Buttons Vertically */
+/* Stack buttons vertically */
 .action-buttons {
     display: flex;
     flex-direction: column;
-    align-items: center; /* Center within the td */
-    gap: 6px;
-    max-width: 100%;          /* Prevent overflow */
-    word-wrap: break-word;
-    box-sizing: border-box;
+    align-items: center;
+    gap: 8px;
 }
-

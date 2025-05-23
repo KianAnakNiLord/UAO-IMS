@@ -62,58 +62,102 @@ body {
 }
 
 /* === Table Styling === */
+/* === 🧹 Remove Table Scroll & Ensure Responsive Fit === */
 .table-responsive {
-    overflow-x: auto;
-    border-radius: 8px;
+    overflow-x: unset !important;
 }
 
 .table-responsive table {
+    table-layout: fixed;
     width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
-    border-radius: 8px;
-    overflow: hidden;
+    word-wrap: break-word;
 }
 
-.table-responsive th,
-.table-responsive td {
-    padding: 14px 16px;
-    border: 1px solid #ddd;
-    text-align: left;
-    vertical-align: middle;
+
+/* === ✨ Modern Table UI Enhancements === */
+.table-responsive table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 12px;
+    word-wrap: break-word;
+    table-layout: fixed;
+
 }
 
 .table-responsive thead {
-    background: linear-gradient(to right, #3A53A4, #2f418a);
-    color: white;
+    background-color: transparent;
+    color: #3A53A4;
 }
 
-.table-responsive th {
-    text-transform: uppercase;
+.table-responsive thead th {
+    background-color: #f0f2f7;
     font-size: 13px;
-    letter-spacing: 0.5px;
+    font-weight: 600;
+    padding: 12px 14px;
+    border-bottom: 1px solid #d0d7e2;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    text-align: left;
 }
 
-.table-responsive td span {
-    font-weight: bold;
+.table-responsive tbody tr {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+    transition: all 0.2s ease-in-out;
 }
 
-/* === Status Colors === */
-.table-responsive td span[style*="green"] {
+.table-responsive tbody tr:hover {
+    transform: scale(1.005);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+}
+
+.table-responsive td {
+    padding: 16px;
+    font-size: 14px;
+    color: #333;
+    border-top: 1px solid #eef1f7;
+}
+
+.table-responsive td:first-child {
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
+}
+
+.table-responsive td:last-child {
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
+}
+
+td.status-cell span {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: 600;
+    background-color: #f2f4f9;
+}
+
+td span[style*="green"] {
+    background-color: #e7f5ec;
     color: #28a745 !important;
 }
-.table-responsive td span[style*="orange"] {
+td span[style*="orange"] {
+    background-color: #fff3e4;
     color: #fd7e14 !important;
 }
-.table-responsive td span[style*="red"] {
+td span[style*="red"] {
+    background-color: #fce2e3;
     color: #dc3545 !important;
 }
-.table-responsive td span[style*="blue"] {
+td span[style*="blue"] {
+    background-color: #e3ecfc;
     color: #007bff !important;
 }
-.table-responsive td span[style*="darkred"] {
+td span[style*="darkred"] {
+    background-color: #f4d4d4;
     color: #800000 !important;
 }
+
 
 /* === Action Buttons === */
 td.actions {

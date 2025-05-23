@@ -1,66 +1,72 @@
 /* ================================
-   🧾 Borrower Dashboard Styling
+   🧾 Borrower Dashboard – Unified UI Style
    ================================ */
 
 body {
     font-family: 'Segoe UI', sans-serif;
-    background-color: #f2f4f8;
+    background-color: #f5f7fa;
     margin: 0;
     padding: 0;
 }
 
+/* Main Container */
 .dashboard-container {
-    max-width: 1100px;
+    max-width: 1300px;
     margin: 40px auto;
     padding: 40px;
-    background: white;
-    border-radius: 14px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
     color: #3A53A4;
+    border-top: 6px solid #B99433;
 }
 
+/* Title */
 .dashboard-container h1 {
-    color: #B99433;
-    text-align: center;
-    font-size: 32px;
-    margin-bottom: 25px;
-    font-weight: 700;
+    font-size: 28px;
+    font-weight: bold;
+    color: #3A53A4;
+    margin-bottom: 30px;
+    border-left: 6px solid #B99433;
+    padding-left: 15px;
 }
 
+/* Greeting */
 .greeting {
     text-align: center;
-    font-size: 18px;
+    font-size: 17px;
     color: #3A53A4;
-    margin-bottom: 35px;
+    margin-bottom: 30px;
     font-weight: 500;
 }
 
-/* Section Styling */
+/* Section Cards */
 .section {
-    margin-bottom: 35px;
-    padding: 25px;
-    border-radius: 10px;
+    margin-bottom: 30px;
+    padding: 25px 30px;
     background: #f9f9fc;
     border-left: 6px solid #B99433;
+    border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
 }
 
+/* Section Headings */
 .section h2 {
-    color: #3A53A4;
     font-size: 20px;
     margin-bottom: 15px;
+    color: #3A53A4;
 }
 
-/* Lists and Content */
-.section p {
+/* Content Paragraphs */
+.section p,
+.section ol {
     font-size: 15px;
     line-height: 1.7;
+    color: #333;
 }
 
 .section ol {
-    padding-left: 22px;
-    font-size: 15px;
-    line-height: 1.7;
+    padding-left: 20px;
 }
 
 .section ol li::marker {
@@ -68,18 +74,20 @@ body {
     font-weight: bold;
 }
 
+/* Image Styling */
 .uao-image img {
+    width: 100%;
     max-width: 100%;
     border-radius: 10px;
-    border: 2px solid #ddd;
+    border: 2px solid #ccc;
     margin-top: 15px;
 }
 
 /* Contact Links */
 .uao-contact a {
     color: #3A53A4;
-    text-decoration: underline;
     font-weight: 500;
+    text-decoration: underline;
 }
 
 .uao-contact a:hover {
@@ -87,22 +95,24 @@ body {
     text-decoration: none;
 }
 
-/* Logout Button Section */
+/* Logout Section */
 .section.logout {
     text-align: center;
-    margin-top: 40px;
 }
 
 .btn.logout {
     background-color: #dc3545;
     color: white;
-    padding: 12px 20px;
-    border-radius: 6px;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
     font-weight: bold;
     text-decoration: none;
+    cursor: pointer;
     transition: background-color 0.3s ease;
 }
 
 .btn.logout:hover {
-    background-color: #c82333;
+    background-color: #bd2130;
 }

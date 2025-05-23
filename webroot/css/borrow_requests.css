@@ -1,80 +1,120 @@
 /* =============================
-   Borrow Request Management Styles
+   📝 Borrow Request Management – Xavier Style
    ============================= */
 
-   body {
+body {
     background-color: #f5f7fa;
     font-family: "Segoe UI", sans-serif;
+    margin: 0;
+    padding: 0;
 }
 
-h3 {
+/* Container Wrapper */
+.borrow-requests-container {
+    max-width: 1300px;
+    margin: 40px auto;
+    padding: 40px;
+    background-color: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+    border-top: 6px solid #B99433;
+}
+
+/* Title */
+.borrow-requests-container h3 {
     color: #3A53A4;
-    margin-top: 20px;
-    margin-bottom: 25px;
-    font-size: 26px;
+    font-size: 28px;
     font-weight: bold;
+    margin-bottom: 25px;
+    border-left: 6px solid #B99433;
+    padding-left: 15px;
 }
 
-/* Table styling */
-table {
+/* Table Styling */
+.borrow-requests-table {
     width: 100%;
     border-collapse: collapse;
-    background: white;
-    border-radius: 8px;
+    background-color: white;
+    border-radius: 10px;
     overflow: hidden;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+    margin-top: 20px;
 }
 
-table thead {
-    background-color: #3A53A4;
+.borrow-requests-table thead {
+    background: linear-gradient(to right, #3A53A4, #2f418a);
     color: white;
 }
 
-table th,
-table td {
-    padding: 12px 14px;
-    text-align: left;
-    border-bottom: 1px solid #e0e0e0;
+.borrow-requests-table th {
+    padding: 14px;
     font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-align: left;
 }
 
-table td em {
-    color: #888;
-    font-style: italic;
+.borrow-requests-table td {
+    padding: 14px;
+    font-size: 14px;
+    border-bottom: 1px solid #e0e0e0;
+    color: #333;
 }
 
-table tr:last-child td {
+.borrow-requests-table tr:last-child td {
     border-bottom: none;
+}
+
+.borrow-requests-table td em {
+    font-style: italic;
+    color: #888;
 }
 
 /* Buttons */
 .button {
     display: inline-block;
-    width: 120px; /* Set fixed width to maintain uniformity */
-    padding: 12px 20px; /* Add more padding for better button height and text alignment */
-    margin: 8px 10px; /* Increased margin for more space between buttons */
+    min-width: 110px;
+    padding: 10px 16px;
+    margin: 6px 4px;
     background-color: #3A53A4;
     color: white;
     border: none;
     border-radius: 6px;
     font-size: 14px;
+    font-weight: 500;
     cursor: pointer;
+    text-align: center;
     text-decoration: none;
     transition: background 0.3s ease;
-    text-align: center; /* Ensures text is centered inside the button */
-    box-sizing: border-box; /* Ensures padding is included within the button width */
+    box-shadow: 0 3px 8px rgba(58, 83, 164, 0.1);
 }
 
-/* Button hover effect */
 .button:hover {
     background-color: #2e418a;
 }
 
-/* Danger button (Reject) style */
+/* Danger Button */
 .button.danger {
-    background-color: #d9534f;
+    background-color: #dc3545;
 }
 
 .button.danger:hover {
-    background-color: #c9302c;
+    background-color: #bd2130;
+}
+
+/* Responsive Layout */
+@media (max-width: 768px) {
+    .borrow-requests-container {
+        padding: 25px;
+    }
+
+    .borrow-requests-table th,
+    .borrow-requests-table td {
+        padding: 12px;
+    }
+
+    .button {
+        width: 100%;
+        margin: 8px 0;
+    }
 }

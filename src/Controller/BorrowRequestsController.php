@@ -71,20 +71,35 @@ class BorrowRequestsController extends AppController
     }
 
     // ✅ Pagination config: limit 5 per page
-    $this->paginate = [
-        'limit' => 5,
-        'order' => ['BorrowRequests.created' => 'desc']
-    ];
+    // ✅ Get status filter from query string
+$statusFilter = $this->request->getQuery('status');
 
-    // ✅ Display filtered borrow requests (admin vs borrower)
-    $query = $isAdmin
-        ? $this->BorrowRequests->find()->contain(['Users', 'InventoryItems'])
-        : $this->BorrowRequests->find()
-            ->where(['user_id' => $user?->get('id')])
-            ->contain(['InventoryItems']);
+// ✅ Pagination config: limit 5 per page
+$this->paginate = [
+    'limit' => 5,
+    'order' => ['BorrowRequests.created' => 'desc']
+];
 
-    $borrowRequests = $this->paginate($query);
-    $this->set(compact('borrowRequests'));
+// ✅ Build dynamic query based on role and status
+$conditions = [];
+
+if (!$isAdmin) {
+    $conditions['user_id'] = $user?->get('id');
+}
+
+if (!empty($statusFilter)) {
+    $conditions['status'] = $statusFilter;
+}
+
+// ✅ Query with conditions and associations
+$query = $this->BorrowRequests->find()
+    ->where($conditions)
+    ->contain(['Users', 'InventoryItems']);
+
+// ✅ Paginate and pass filter to view
+$borrowRequests = $this->paginate($query);
+$this->set(compact('borrowRequests', 'statusFilter'));
+
 }
 
 
@@ -289,6 +304,77 @@ public function viewApproval($id = null)
     ]);
 
     $this->set(compact('request'));
+}
+
+public function edit($id = null)
+{
+    $user = $this->request->getAttribute('identity');
+    $borrowRequest = $this->BorrowRequests->get($id);
+
+    // ✅ Allow only the owner to edit pending requests
+    if (!$user || $user->id !== $borrowRequest->user_id || $borrowRequest->status !== 'pending') {
+        $this->Flash->error('You are not allowed to edit this request.');
+        return $this->redirect(['action' => 'index']);
+    }
+
+    if ($this->request->is(['patch', 'post', 'put'])) {
+        $data = $this->request->getData();
+
+        // Convert time properly
+        if (!empty($data['return_time'])) {
+            $data['return_time'] = date('H:i:s', strtotime($data['return_time']));
+        }
+
+        // ✅ Validate that return date/time is still in the future
+        if (!empty($data['return_date']) && !empty($data['return_time'])) {
+            $returnDateTime = new \DateTime("{$data['return_date']} {$data['return_time']}");
+            $now = new \DateTime();
+            if ($returnDateTime <= $now) {
+                $this->Flash->error('Return date/time must be in the future.');
+                return $this->redirect(['action' => 'edit', $id]);
+            }
+        }
+
+        // ✅ Update ID image if reuploaded
+        $file = $this->request->getData('id_image');
+        if ($file instanceof \Laminas\Diactoros\UploadedFile && $file->getError() === 0) {
+            $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+            $maxSize = 2 * 1024 * 1024;
+
+            if (!in_array($file->getClientMediaType(), $allowedTypes)) {
+                $this->Flash->error('Only JPG, PNG, and GIF files are allowed.');
+                return $this->redirect(['action' => 'edit', $id]);
+            }
+
+            if ($file->getSize() > $maxSize) {
+                $this->Flash->error('The image must be less than 2MB.');
+                return $this->redirect(['action' => 'edit', $id]);
+            }
+
+            $filename = time() . '_' . $file->getClientFilename();
+            $file->moveTo(WWW_ROOT . 'uploads' . DS . $filename);
+            $data['id_image'] = 'uploads/' . $filename;
+        } else {
+            unset($data['id_image']); // Leave existing image unchanged
+        }
+
+        $this->BorrowRequests->patchEntity($borrowRequest, $data);
+
+        if ($this->BorrowRequests->save($borrowRequest)) {
+            $this->Flash->success('Request updated successfully.');
+            return $this->redirect(['action' => 'index']);
+        }
+
+        $this->Flash->error('Could not update the request.');
+    }
+
+    // ✅ Fetch inventory items again
+    $flatInventory = $this->InventoryItems
+        ->find()
+        ->where(['item_condition !=' => 'damaged', 'quantity >' => 0])
+        ->toArray();
+
+    $this->set(compact('borrowRequest', 'flatInventory'));
 }
 
 }

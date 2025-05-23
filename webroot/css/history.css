@@ -1,36 +1,76 @@
-/* Container Wrapper */
+/* ===============================
+   🕘 Borrow History – Xavier UI (Updated Layout)
+   =============================== */
+
+/* Overall Page Container */
 .history-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 30px;
+    max-width: 1300px;
+    margin: 40px auto;
+    padding: 40px;
+    background-color: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+    border-top: 6px solid #B99433;
 }
 
-/* Title */
+/* Title Styling */
 .history-title {
-    color: #B99433;
+    color: #3A53A4;
     font-size: 28px;
     font-weight: bold;
-    text-align: center;
-    margin-bottom: 5px;
+    margin-bottom: 30px;
+    border-left: 6px solid #B99433;
+    padding-left: 15px;
 }
 
-/* Search Box */
+/* 🧭 Two-Column Wrapper */
+.search-intro-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 40px;
+    flex-wrap: wrap;
+}
+
+/* 🏫 Logo Box */
+.search-intro-left {
+    flex: 0 0 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.history-logo-img {
+    max-height: 70px;
+    opacity: 0.9;
+}
+
+/* 📄 Description + Form */
+.search-intro-right {
+    flex: 1;
+    min-width: 300px;
+}
+
+.history-subtext {
+    font-size: 15px;
+    color: #3A53A4;
+    margin-bottom: 25px;
+    line-height: 1.6;
+}
+
+/* 🔎 Form Styling */
 .history-search {
-    margin-bottom: 40px;
+    margin-bottom: 35px;
     background-color: #f5f7fa;
     padding: 30px;
     border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-    gap: 25px;
-    flex-wrap: wrap;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
 }
 
 .history-search .input {
     display: flex;
     flex-direction: column;
+    margin-bottom: 20px;
 }
 
 .history-search label {
@@ -42,11 +82,17 @@
 
 .history-search input[type="text"] {
     padding: 12px 16px;
-    width: 300px;
+    width: 100%;
     border: 1px solid #ccc;
     border-radius: 8px;
     font-size: 14px;
-        margin-bottom: 10px;
+    transition: border 0.3s ease;
+}
+
+.history-search input[type="text"]:focus {
+    border-color: #3A53A4;
+    outline: none;
+    box-shadow: 0 0 5px rgba(58, 83, 164, 0.2);
 }
 
 .history-search button {
@@ -58,52 +104,69 @@
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    height: 44px;
-    transition: background-color 0.2s ease-in-out;
+    transition: background-color 0.3s ease;
 }
 
 .history-search button:hover {
     background-color: #2f418a;
 }
 
-/* Table Styling */
+/* Table Section */
 .history-wrapper {
     background: white;
     border-radius: 12px;
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
     padding: 30px;
+    overflow-x: auto;
 }
 
 .history-table {
     width: 100%;
     border-collapse: collapse;
+    border-radius: 8px;
+    overflow: hidden;
 }
 
-.history-table th,
-.history-table td {
-    padding: 14px 16px;
-    border: 1px solid #ddd;
-    text-align: left;
-    font-size: 14px;
-}
-
-.history-table th {
-    background-color: #3A53A4;
+.history-table thead {
+    background: linear-gradient(to right, #3A53A4, #2f418a);
     color: white;
 }
 
-.history-table td {
-    background-color: #f9f9f9;
+.history-table th {
+    padding: 14px;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-align: left;
 }
 
-/* Delete Button */
+.history-table td {
+    padding: 14px;
+    font-size: 14px;
+    background-color: #f9f9f9;
+    border-bottom: 1px solid #e0e0e0;
+    color: #333;
+}
+
+.history-table tr:last-child td {
+    border-bottom: none;
+}
+
+.history-table td em {
+    font-style: italic;
+    color: #888;
+}
+
+/* Delete / Action Buttons */
 .btn.mark-overdue {
     background-color: #dc3545;
     color: white;
     padding: 6px 12px;
-    border-radius: 4px;
-    text-decoration: none;
+    border-radius: 6px;
+    font-weight: bold;
     border: none;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
 }
 
 .btn.mark-overdue:hover {
@@ -120,8 +183,7 @@
     list-style: none;
     padding: 0;
     display: inline-flex;
-    gap: 10px;
-    margin-bottom: 10px;
+    gap: 8px;
 }
 
 .history-pagination a {
@@ -130,6 +192,7 @@
     padding: 8px 14px;
     border-radius: 6px;
     text-decoration: none;
+    font-weight: 500;
 }
 
 .history-pagination a:hover {

@@ -12,16 +12,24 @@
 
     <!-- 🔽 Enhanced Status Filter Bar -->
 <div class="filter-section">
-    <label for="statusFilter">Filter by Status:</label>
-    <select id="statusFilter" class="form-control status-dropdown">
-        <option value="">All</option>
-        <option value="approved">Approved</option>
-        <option value="pending">Pending</option>
-        <option value="rejected">Rejected</option>
-        <option value="returned">Returned</option>
-        <option value="overdue">Overdue</option>
-    </select>
+    <?= $this->Form->create(null, ['type' => 'get']) ?>
+        <label for="statusFilter">Filter by Status:</label>
+        <?= $this->Form->select('status', [
+            '' => 'All',
+            'approved' => 'Approved',
+            'pending' => 'Pending',
+            'rejected' => 'Rejected',
+            'returned' => 'Returned',
+            'overdue' => 'Overdue'
+        ], [
+            'default' => $statusFilter ?? '',
+            'id' => 'statusFilter',
+            'class' => 'form-control status-dropdown',
+            'onchange' => 'this.form.submit()'
+        ]) ?>
+    <?= $this->Form->end() ?>
 </div>
+
 
 
     <div class="table-responsive">
@@ -107,16 +115,28 @@
                     </td>
 
                     <td class="actions">
-                        <?= $this->Form->postLink(
-                            __('Delete'),
-                            ['action' => 'delete', $borrowRequest->id],
-                            [
-                                'confirm' => __('Are you sure you want to delete # {0}?', $borrowRequest->id),
-                                'class' => 'danger-btn',
-                                'title' => 'Delete this request'
-                            ]
-                        ) ?>
-                    </td>
+    <?php if ($status === 'pending' && $isOwner): ?>
+        <?= $this->Html->link('Edit', ['action' => 'edit', $borrowRequest->id], [
+    'class' => 'edit-btn',
+    'title' => 'Edit this pending request'
+]) ?>
+
+        <br>
+    <?php endif; ?>
+
+    <?php if (in_array($status, ['pending', 'rejected']) && $isOwner): ?>
+    <?= $this->Form->postLink(
+        __('Delete'),
+        ['action' => 'delete', $borrowRequest->id],
+        [
+            'confirm' => __('Are you sure you want to delete # {0}?', $borrowRequest->id),
+            'class' => 'danger-btn',
+            'title' => 'Delete this request'
+        ]
+    ) ?>
+<?php endif; ?>
+
+
                 </tr>
                 <?php endforeach; ?>
             </tbody>
@@ -155,3 +175,25 @@
         });
     });
 </script>
+<style>
+.actions .edit-btn {
+    background-color: #3A53A4 !important;
+    color: white !important;
+    padding: 8px 21px !important;
+    font-size: 13px !important;
+    border: none !important;
+    border-radius: 8px !important;
+    font-weight: bold;
+    display: inline-block;
+    margin-bottom: 5px;
+    text-align: center;
+    text-decoration: none;
+    transition: background 0.3s ease;
+}
+
+.actions .edit-btn:hover {
+    background-color: #2f418a !important;
+}
+</style>
+
+

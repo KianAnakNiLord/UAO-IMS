@@ -346,6 +346,7 @@ public function rejectRequest($id = null)
     // Get search queries from GET
     $emailSearch = $this->request->getQuery('email');
     $nameSearch = $this->request->getQuery('name');
+    $onlyOverdue = $this->request->getQuery('only_overdue'); // ✅ new filter
 
     // Build base query
     $query = $this->BorrowRequests->find()
@@ -362,12 +363,21 @@ public function rejectRequest($id = null)
         $query->where(['Users.name LIKE' => '%' . $nameSearch . '%']);
     }
 
+    // ✅ Filter: Only show records with overdue duration
+    if ($onlyOverdue) {
+        $query->where(function ($exp) {
+            return $exp->isNotNull('BorrowRequests.overdue_duration')
+                        ->notEq('BorrowRequests.overdue_duration', '');
+        });
+    }
+
     // Paginate results
     $history = $this->paginate($query);
 
     // Set for view
     $this->set(compact('history'));
 }
+
 
     public function approvedRequests()
 {
