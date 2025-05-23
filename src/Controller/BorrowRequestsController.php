@@ -306,6 +306,16 @@ public function viewApproval($id = null)
     $this->set(compact('request'));
 }
 
+public function viewRemark($id = null)
+{
+    $request = $this->BorrowRequests->get($id, [
+        'contain' => ['Users', 'InventoryItems'],
+    ]);
+
+    $this->set(compact('request'));
+}
+
+
 public function edit($id = null)
 {
     $user = $this->request->getAttribute('identity');

@@ -412,6 +412,7 @@ public function markAsReturned($id = null)
         $data = $this->request->getData();
         $returnedGood = (int)$data['returned_quantity'];
         $returnedDamaged = (int)$data['damaged_quantity'];
+        $additionalRemark = trim($data['remark'] ?? '');
         $totalReturned = $returnedGood + $returnedDamaged;
 
         if ($totalReturned > $request->quantity_requested) {
@@ -436,7 +437,7 @@ public function markAsReturned($id = null)
             'status' => 'returned',
             'returned_good' => $returnedGood,
             'returned_damaged' => $returnedDamaged,
-            'return_remark' => "Returned: {$returnedGood} good" . ($returnedDamaged > 0 ? ", {$returnedDamaged} damaged" : ""),
+            'return_remark' => $additionalRemark, // ✅ Use form input
             'quantity' => $totalReturned
         ]);
 
@@ -464,7 +465,6 @@ public function markAsReturned($id = null)
 
     $this->set(compact('request'));
 }
-
 
 
 

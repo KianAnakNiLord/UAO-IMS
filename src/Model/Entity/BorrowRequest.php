@@ -50,5 +50,6 @@ class BorrowRequest extends Entity
     'approval_note' => true,
     'overdue_duration' => true,
     '*' => true,
+    'return_remark' => true,
     ];
 }

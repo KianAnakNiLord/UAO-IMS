@@ -72,6 +72,10 @@
     <br>
     <?= $this->Html->link('View Approval', ['action' => 'viewApproval', $borrowRequest->id], ['class' => 'view-reason-link']) ?>
 <?php endif; ?>
+    <?php if ($status === 'returned' && $borrowRequest->return_remark): ?>
+    <br>
+    <?= $this->Html->link('View Return Remark', ['action' => 'viewRemark', $borrowRequest->id], ['class' => 'view-reason-link']) ?>
+<?php endif; ?>
 
 
 
