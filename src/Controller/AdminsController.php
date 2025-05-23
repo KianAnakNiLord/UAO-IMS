@@ -399,9 +399,9 @@ public function markAsReturned($id = null)
     $request = $this->BorrowRequests->get($id);
 
     if ($this->request->is(['post', 'put'])) {
-        // ✅ Setup Query Logger
+        // ✅ Setup SQL Query Logger
         $logger = new \Cake\Database\Log\QueryLogger();
-        $connection = ConnectionManager::get('default');
+        $connection = \Cake\Datasource\ConnectionManager::get('default');
         $driver = $connection->getDriver();
 
         if (method_exists($driver, 'setLogger')) {
@@ -439,17 +439,19 @@ public function markAsReturned($id = null)
             \Cake\Log\Log::write('debug', "Not previously overdue or missing return date/time.");
         }
 
-        // ✅ Patch entity
+        // ✅ Patch basic fields
         $this->BorrowRequests->patchEntity($request, [
-            
             'status' => 'returned',
             'returned_good' => $returnedGood,
             'returned_damaged' => $returnedDamaged,
             'return_remark' => "Returned: {$returnedGood} good" . ($returnedDamaged > 0 ? ", {$returnedDamaged} damaged" : ""),
-            'quantity' => $totalReturned,
-            'overdue_duration' => $duration
+            'quantity' => $totalReturned
         ]);
+
+        // ✅ Force overdue_duration directly
+        $request->overdue_duration = $duration;
         $request->setDirty('overdue_duration', true);
+
         // ✅ Inventory update
         $inventoryTable = $this->fetchTable('InventoryItems');
         $item = $inventoryTable->get($request->inventory_item_id);
@@ -460,7 +462,7 @@ public function markAsReturned($id = null)
         debug('FINAL TO SAVE: ' . json_encode($request->toArray()));
         debug($request->getErrors());
 
-        // ✅ Save the request
+        // ✅ Save the borrow request
         if (!$this->BorrowRequests->save($request)) {
             $reflection = new \ReflectionClass($logger);
             if ($reflection->hasProperty('_queries')) {
@@ -468,7 +470,7 @@ public function markAsReturned($id = null)
                 $prop->setAccessible(true);
                 $queries = $prop->getValue($logger);
                 debug("❌ SQL QUERY LOG:");
-                debug(end($queries));
+                debug(end($queries)); // show only the last
             }
 
             \Cake\Log\Log::write('error', '❌ Failed to save BorrowRequest: ' . json_encode($request->getErrors()));
@@ -488,6 +490,8 @@ public function markAsReturned($id = null)
 
     $this->set(compact('request'));
 }
+
+
 
 
 
