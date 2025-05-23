@@ -164,12 +164,16 @@ class BorrowRequestsController extends AppController
 
     // Fetch inventory items for the form dropdown
     $this->InventoryItems = $this->fetchTable('InventoryItems');
-    $flatInventory = $this->InventoryItems
-        ->find()
-        ->where(['item_condition !=' => 'damaged'])
-        ->toArray();
+$flatInventory = $this->InventoryItems
+    ->find()
+    ->where([
+        'item_condition !=' => 'damaged',
+        'quantity >' => 0 // ✅ Hide zero-quantity items
+    ])
+    ->toArray();
 
-    $this->set(compact('borrowRequest', 'flatInventory'));
+$this->set(compact('borrowRequest', 'flatInventory'));
+
 }
 
 
