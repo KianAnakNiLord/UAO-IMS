@@ -47,5 +47,9 @@ class BorrowRequest extends Entity
         'id_image' => true,
             'returned_good' => true,
     'returned_damaged' => true,
+    'approval_note' => true,
+    'overdue_duration' => true,
+    '*' => true,
+    'id' => false,
     ];
 }

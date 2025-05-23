@@ -38,6 +38,7 @@
                     <th><?= __('Request Date') ?></th>
                     <th><?= __('Return Date') ?></th>
                     <th><?= __('Return Time') ?></th>
+                    <th><?= __('Overdue Duration') ?></th>
                     <th><?= __('Action') ?></th>
                 </tr>
             </thead>
@@ -63,6 +64,8 @@
                             <td><?= h($borrowRequest->request_date) ?></td>
                             <td><?= h($borrowRequest->return_date) ?></td>
                             <td><?= h($borrowRequest->return_time ?? 'N/A') ?></td>
+                            <td><?= h($borrowRequest->overdue_duration ?? '-') ?></td>
+
                             <td>
                                 <?= $this->Form->postLink(
                                     'Delete',

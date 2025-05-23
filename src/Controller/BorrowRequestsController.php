@@ -31,8 +31,8 @@ class BorrowRequestsController extends AppController
     $now = new \DateTime();
 
     $overdueRequests = $this->BorrowRequests->find()
-        ->contain(['Users', 'InventoryItems']) // ✅ Needed for email sending
-        ->where(['status' => 'approved']) // ✅ FIX: Only process approved
+        ->contain(['Users', 'InventoryItems'])
+        ->where(['status' => 'approved'])
         ->all();
 
     foreach ($overdueRequests as $request) {
@@ -44,7 +44,6 @@ class BorrowRequestsController extends AppController
                 $request->return_remark = 'Automatically marked overdue by system';
 
                 if ($this->BorrowRequests->save($request)) {
-                    // ✅ Send overdue email
                     if ($request->user && $request->inventory_item) {
                         $user = $request->user;
                         $item = $request->inventory_item;
@@ -66,28 +65,48 @@ class BorrowRequestsController extends AppController
         }
     }
 
-    // ✅ Display filtered borrow requests
+    // ✅ Pagination config: limit 5 per page
+    $this->paginate = [
+        'limit' => 5,
+        'order' => ['BorrowRequests.created' => 'desc']
+    ];
+
+    // ✅ Display filtered borrow requests (admin vs borrower)
     $query = $isAdmin
-        ? $this->BorrowRequests->find('all')->contain(['Users', 'InventoryItems'])
-        : $this->BorrowRequests->find('all')
+        ? $this->BorrowRequests->find()->contain(['Users', 'InventoryItems'])
+        : $this->BorrowRequests->find()
             ->where(['user_id' => $user?->get('id')])
             ->contain(['InventoryItems']);
 
     $borrowRequests = $this->paginate($query);
     $this->set(compact('borrowRequests'));
 }
+
    // ✅ Borrower - Submit Request
     // ✅ Borrower - Submit Request
     public function add()
 {
+    $identity = $this->request->getAttribute('identity');
+    $userId = $identity->get('id');
+
+    // ✅ BLOCK users with existing overdue requests
+    $hasOverdue = $this->BorrowRequests
+        ->find()
+        ->where(['user_id' => $userId, 'status' => 'overdue'])
+        ->count();
+
+    if ($hasOverdue > 0) {
+        $this->Flash->error('You cannot make a new borrow request while you have an overdue item. Please return it first.');
+        return $this->redirect(['action' => 'index']);
+    }
+
     $borrowRequest = $this->BorrowRequests->newEmptyEntity();
 
     if ($this->request->is('post')) {
         $data = $this->request->getData();
 
         // Automatically set user_id and status
-        $identity = $this->request->getAttribute('identity');
-        $data['user_id'] = $identity->get('id');
+        $data['user_id'] = $userId;
         $data['status'] = 'pending';
 
         // Convert return_time to proper format
@@ -146,9 +165,9 @@ class BorrowRequestsController extends AppController
     // Fetch inventory items for the form dropdown
     $this->InventoryItems = $this->fetchTable('InventoryItems');
     $flatInventory = $this->InventoryItems
-    ->find()
-    ->where(['item_condition !=' => 'damaged'])
-    ->toArray();
+        ->find()
+        ->where(['item_condition !=' => 'damaged'])
+        ->toArray();
 
     $this->set(compact('borrowRequest', 'flatInventory'));
 }
@@ -252,6 +271,14 @@ public function checkTime()
     echo "<br><br><strong>Timezone used:</strong> " . date_default_timezone_get();
     phpinfo(); // Show all PHP config (scroll to 'date' section)
     exit;
+}
+public function viewApproval($id = null)
+{
+    $request = $this->BorrowRequests->get($id, [
+        'contain' => ['Users', 'InventoryItems'],
+    ]);
+
+    $this->set(compact('request'));
 }
 
 }

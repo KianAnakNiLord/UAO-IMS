@@ -1,67 +1,104 @@
-/* ================================
-   🧾 Borrow Requests Table Styling
-   ================================ */
-   body {
+/* =============================================
+   🧾 Borrow Requests Table Styling – Immersive UI
+   ============================================= */
+body {
     background-color: #f5f7fa;
     font-family: "Segoe UI", sans-serif;
 }
 
-/* Wrapper */
+/* === Container Wrapper === */
 .borrowRequests.index.content {
     padding: 40px;
-    background-color: #fff;
+    background-color: #ffffff;
     margin: 40px auto;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+    border-radius: 16px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
     max-width: 1300px;
+    position: relative;
+    border-top: 6px solid #B99433;
 }
 
-/* Header + Button */
+/* === Header Title + CTA Button === */
 .borrowRequests h3 {
     color: #3A53A4;
-    font-size: 26px;
-    margin-bottom: 25px;
+    font-size: 28px;
+    margin-bottom: 30px;
+    border-left: 6px solid #B99433;
+    padding-left: 15px;
 }
 
 .borrowRequests .button.float-right {
     float: right;
     background-color: #3A53A4;
     color: white;
-    padding: 10px 16px;
-    border-radius: 6px;
-    font-weight: 500;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
     text-decoration: none;
-    margin-bottom: 20px;
+    transition: background 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .borrowRequests .button.float-right:hover {
     background-color: #2f418a;
 }
 
-/* Table */
+/* === Filter Dropdown === */
+.filter-section {
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.status-dropdown {
+    width: 220px;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background: #f9fafc;
+    font-size: 14px;
+}
+
+/* === Table Styling === */
+.table-responsive {
+    overflow-x: auto;
+    border-radius: 8px;
+}
+
 .table-responsive table {
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 20px;
+    border-radius: 8px;
+    overflow: hidden;
 }
 
 .table-responsive th,
 .table-responsive td {
-    padding: 12px 14px;
+    padding: 14px 16px;
     border: 1px solid #ddd;
     text-align: left;
+    vertical-align: middle;
 }
 
 .table-responsive thead {
-    background-color: #3A53A4;
+    background: linear-gradient(to right, #3A53A4, #2f418a);
     color: white;
+}
+
+.table-responsive th {
+    text-transform: uppercase;
+    font-size: 13px;
+    letter-spacing: 0.5px;
 }
 
 .table-responsive td span {
     font-weight: bold;
 }
 
-/* Status Colors */
+/* === Status Colors === */
 .table-responsive td span[style*="green"] {
     color: #28a745 !important;
 }
@@ -78,7 +115,43 @@
     color: #800000 !important;
 }
 
-/* Paginator */
+/* === Action Buttons === */
+td.actions {
+    text-align: center;
+    white-space: nowrap;
+}
+
+.actions a,
+.actions form {
+    display: inline-block;
+    margin: 0 3px;
+}
+
+.actions a,
+.actions input[type="submit"] {
+    background-color: #3A53A4;
+    color: white;
+    padding: 7px 14px;
+    font-size: 13px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.actions a:hover,
+.actions input[type="submit"]:hover {
+    background-color: #2f418a;
+}
+
+.actions .danger-btn {
+    background-color: #dc3545;
+}
+.actions .danger-btn:hover {
+    background-color: #bd2130;
+}
+
+/* === Paginator Styling === */
 .paginator {
     text-align: center;
     margin-top: 30px;
@@ -94,13 +167,16 @@
 .pagination li {
     background-color: #fff;
     border: 1px solid #ccc;
-    padding: 6px 12px;
+    padding: 6px 14px;
     border-radius: 5px;
     font-size: 14px;
+    color: #3A53A4;
+    font-weight: 500;
+    transition: background 0.3s ease;
 }
 
 .pagination li:hover {
-    background-color: #3A53A4;
+    background-color: #B99433;
     color: white;
     cursor: pointer;
 }
@@ -111,86 +187,33 @@
     font-weight: bold;
 }
 
-/* Table Header Sorting */
-th a {
-    color: white;
-    text-decoration: none;
+/* === View Reason Link === */
+.view-reason-link {
+    font-size: 12px;
+    display: inline-block;
+    margin-top: 6px;
+    color: #B99433;
     font-weight: bold;
 }
-
-th a:hover {
+.view-reason-link:hover {
     text-decoration: underline;
+    color: #a07f29;
 }
 
-/* Action Buttons */
-.actions a,
-.actions form {
-    display: inline-block;
-    margin-right: 5px;
-}
-
-.actions a,
-.actions input[type="submit"] {
-    background-color: #3A53A4;
-    color: white;
-    padding: 6px 12px;
-    font-size: 13px;
-    border: none;
-    border-radius: 4px;
-    text-decoration: none;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.actions a:hover,
-.actions input[type="submit"]:hover {
-    background-color: #2f418a;
-}
-
-/* Delete (Danger) Buttons */
-.actions .danger-btn {
-    background-color: #dc3545;
-}
-
-.actions .danger-btn:hover {
-    background-color: #bd2130;
-}
-
-/* Flex Layout for Action Buttons */
-td.actions {
-    text-align: center;
-    vertical-align: middle;
-    white-space: nowrap;
-}
-
-
-td.actions a,
-td.actions form {
-    margin: 0 !important;
-}
-
-/* Inventory Item and User Links */
+/* === Links in Table === */
 td a {
     color: #3A53A4;
     text-decoration: none;
     font-weight: 500;
 }
-
 td a:hover {
+    color: #B99433;
     text-decoration: underline;
 }
 
-td {
-    vertical-align: middle;
-}
-
-.table-responsive td {
-    white-space: nowrap;
-}
-
-/* Popup dark background */
+/* === Popup Styling === */
 .popup-overlay {
-    display: none; /* hidden at first */
+    display: none;
     position: fixed;
     top: 0;
     left: 0;
@@ -202,7 +225,6 @@ td {
     justify-content: center;
 }
 
-/* Popup centered white box */
 .popup-box {
     background: #ffffff;
     padding: 30px;
@@ -243,7 +265,69 @@ td {
     background-color: #bd2130;
 }
 
+/* === Responsive Tweak === */
+@media (max-width: 768px) {
+    .borrowRequests.index.content {
+        padding: 25px;
+    }
 
+    .table-responsive td {
+        white-space: normal;
+    }
 
+    .status-dropdown {
+        width: 100%;
+    }
 
+    .borrowRequests h3 {
+        font-size: 22px;
+    }
 
+    /* === Filter Bar Enhanced Design === */
+.filter-section {
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 16px;
+    padding: 15px 20px;
+    background: linear-gradient(90deg, #3A53A4 0%, #2f418a 100%);
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    color: white;
+    font-size: 15px;
+    font-weight: 500;
+    border-left: 6px solid #B99433;
+}
+
+.filter-section label {
+    margin-bottom: 0;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.status-dropdown {
+    width: 240px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: none;
+    background-color: #ffffff;
+    font-size: 14px;
+    font-weight: 500;
+    color: #3A53A4;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+}
+
+.status-dropdown:focus {
+    outline: none;
+    border: 2px solid #B99433;
+    background-color: #f5f7fa;
+}
+
+/* Optional: Animation on change */
+.status-dropdown:active {
+    transform: scale(0.98);
+}
+
+}

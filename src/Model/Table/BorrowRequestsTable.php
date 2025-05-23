@@ -92,6 +92,11 @@ class BorrowRequestsTable extends Table
             ->time('return_time', 'Please provide a valid time for Return Time')
             ->allowEmptyString('return_time');  // Optional, if you want to allow empty time
 
+            $validator
+    ->scalar('overdue_duration')
+    ->maxLength('overdue_duration', 50)
+    ->allowEmptyString('overdue_duration');
+
         return $validator;
     }
 

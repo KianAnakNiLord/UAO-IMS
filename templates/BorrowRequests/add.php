@@ -88,12 +88,30 @@
                     'required' => true
                 ]) ?>
 
-                <?= $this->Form->control('purpose', [
-                    'label' => 'Purpose',
-                    'type' => 'textarea',
-                    'placeholder' => 'State the reason for borrowing...',
-                    'required' => true
-                ]) ?>
+               <div class="form-group">
+    <?= $this->Form->label('purpose', 'Purpose') ?>
+
+    <div style="position: relative;">
+        <?= $this->Form->textarea('purpose', [
+            'id' => 'purpose',
+            'placeholder' => 'State the reason for borrowing (max 100 characters)...',
+            'required' => true,
+            'maxlength' => 100,
+            'style' => 'resize: none; margin-bottom: 2px;',
+            'class' => 'form-control'
+        ]) ?>
+        <small id="charCount" style="
+            display: block;
+            margin: 0 4px;
+            font-size: 13px;
+            color: #666;
+            font-style: italic;
+        ">0 / 100</small>
+    </div>
+</div>
+
+
+
 
                 <?= $this->Form->control('id_image', [
                     'type' => 'file',
@@ -117,6 +135,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const returnDateInput = document.getElementById('return-date');
     const returnTimeInput = document.getElementById('return-time');
     const quantityInput = document.getElementById('quantity-requested');
+    const purposeInput = document.getElementById('purpose');
+    const charCountDisplay = document.getElementById('charCount');
     const form = document.querySelector('form');
     const errorPopup = document.getElementById('errorPopup');
 
@@ -175,6 +195,20 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    // ✅ Purpose live char count & warning
+    purposeInput?.addEventListener('input', function () {
+        const currentLength = purposeInput.value.length;
+        charCountDisplay.textContent = `${currentLength} / 100`;
+
+        if (currentLength > 100) {
+            charCountDisplay.style.color = 'red';
+            purposeInput.style.border = '2px solid red';
+        } else {
+            charCountDisplay.style.color = '#555';
+            purposeInput.style.border = '';
+        }
+    });
+
     // ✅ Validate before submit
     form.addEventListener('submit', function (e) {
         let errorMessage = '';
@@ -182,6 +216,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const selectedQtyText = selectedOption?.textContent?.match(/\(Qty: (\d+)\)/);
         const availableQty = selectedQtyText ? parseInt(selectedQtyText[1]) : null;
         const requestedQty = parseInt(quantityInput.value);
+        const purposeLength = purposeInput?.value.length ?? 0;
 
         if (!inventorySelect.value) {
             errorMessage = 'Please select an inventory item.';
@@ -189,6 +224,8 @@ document.addEventListener('DOMContentLoaded', function () {
             errorMessage = 'Quantity must be at least 1.';
         } else if (availableQty !== null && requestedQty > availableQty) {
             errorMessage = `Requested quantity exceeds available stock (${availableQty}).`;
+        } else if (purposeLength > 100) {
+            errorMessage = 'Purpose must not exceed 100 characters.';
         }
 
         if (errorMessage) {
@@ -208,3 +245,4 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 </script>
+

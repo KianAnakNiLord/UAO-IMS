@@ -2,30 +2,29 @@
 
 <div class="reject-form-wrapper">
     <div class="reject-form-card">
-        <h2 class="reject-title">Reject Borrow Request</h2>
+        <h2 class="reject-title">Approve Borrow Request</h2>
 
-        <?= $this->Form->create($request, ['url' => ['action' => 'rejectRequest', $request->id]]) ?>
+        <?= $this->Form->create($request, ['url' => ['action' => 'approveRequest', $request->id]]) ?>
 
         <div class="info-row"><strong>Borrower:</strong> <?= h($request->user->name ?? 'N/A') ?></div>
         <div class="info-row"><strong>Item:</strong> <?= h($request->inventory_item->name ?? 'N/A') ?></div>
         <div class="info-row"><strong>Quantity:</strong> <?= h($request->quantity_requested) ?></div>
 
         <div class="form-group">
-    <?= $this->Form->label('rejection_reason', 'Reason for Rejection') ?>
-    <?= $this->Form->textarea('rejection_reason', [
-        'id' => 'rejectionReason',
+    <?= $this->Form->label('approval_note', 'Approval Note (Optional)') ?>
+    <?= $this->Form->textarea('approval_note', [
+        'id' => 'approvalNote',
         'maxlength' => 75,
-        'required' => true,
-        'placeholder' => 'Explain why this request is being rejected',
+        'placeholder' => 'You can leave a note for the borrower...',
         'style' => 'resize: none;',
         'class' => 'form-control'
     ]) ?>
-    <small id="rejectionCharCount" style="font-size: 13px; color: #666; display: block; margin-top: 6px;">0 / 75</small>
+    <small id="approvalCharCount" style="font-size: 13px; color: #666; display: block; margin-top: 6px;">0 / 75</small>
 </div>
 
 
         <div class="form-buttons">
-            <?= $this->Form->button('Submit Rejection', ['class' => 'reject-btn']) ?>
+            <?= $this->Form->button('Confirm Approval', ['class' => 'reject-btn']) ?>
             <?= $this->Html->link('Cancel', ['action' => 'borrowRequests'], ['class' => 'cancel-btn']) ?>
         </div>
 

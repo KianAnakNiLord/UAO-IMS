@@ -9,8 +9,23 @@
 <div class="borrowRequests index content">
     <?= $this->Html->link(__('New Borrow Request'), ['action' => 'add'], ['class' => 'button float-right']) ?>
     <h3><?= __('Borrow Requests') ?></h3>
+
+    <!-- 🔽 Enhanced Status Filter Bar -->
+<div class="filter-section">
+    <label for="statusFilter">Filter by Status:</label>
+    <select id="statusFilter" class="form-control status-dropdown">
+        <option value="">All</option>
+        <option value="approved">Approved</option>
+        <option value="pending">Pending</option>
+        <option value="rejected">Rejected</option>
+        <option value="returned">Returned</option>
+        <option value="overdue">Overdue</option>
+    </select>
+</div>
+
+
     <div class="table-responsive">
-        <table>
+        <table id="borrowRequestsTable">
             <thead>
                 <tr>
                     <th><?= __('Inventory Item') ?></th>
@@ -29,35 +44,44 @@
                 <tr>
                     <td><?= h($borrowRequest->inventory_item->name) ?></td>
                     <td><?= h($borrowRequest->quantity_requested) ?> pcs</td>
-                    <td>
-                        <?php
-                            $status = $borrowRequest->status;
-                            $color = match ($status) {
-                                'approved' => 'green',
-                                'pending' => 'orange',
-                                'rejected' => 'red',
-                                'returned' => 'blue',
-                                'overdue' => 'darkred',
-                                default => 'black'
-                            };
-                        ?>
-                        <span style="color: <?= $color ?>;">
-                            <?= ucfirst(h($status)) ?>
-                        </span>
-                        <?php if ($status === 'rejected' && $borrowRequest->rejection_reason): ?>
-                            <br>
-                            <?= $this->Html->link('View Reason', ['action' => 'viewReason', $borrowRequest->id], ['class' => 'view-reason-link']) ?>
-                        <?php endif; ?>
+                    <td class="status-cell">
+    <?php
+        $status = $borrowRequest->status;
+        $color = match ($status) {
+            'approved' => 'green',
+            'pending' => 'orange',
+            'rejected' => 'red',
+            'returned' => 'blue',
+            'overdue' => 'darkred',
+            default => 'black'
+        };
+    ?>
+    <span style="color: <?= $color ?>;">
+        <?= ucfirst(h($status)) ?>
+    </span>
 
-                        <?php if ($status === 'overdue' && $borrowRequest->return_date && $borrowRequest->return_time): ?>
-                            <?php
-                                $due = new DateTime($borrowRequest->return_date->format('Y-m-d') . ' ' . $borrowRequest->return_time->format('H:i:s'));
-                                $now = new DateTime();
-                                $interval = $now->diff($due);
-                                echo "<br><small style='color:red;'>Overdue by {$interval->days}d {$interval->h}h {$interval->i}m</small>";
-                            ?>
-                        <?php endif; ?>
-                    </td>
+    <?php if ($status === 'approved' && $borrowRequest->approval_note): ?>
+    <br>
+    <?= $this->Html->link('View Approval', ['action' => 'viewApproval', $borrowRequest->id], ['class' => 'view-reason-link']) ?>
+<?php endif; ?>
+
+
+
+    <?php if ($status === 'rejected' && $borrowRequest->rejection_reason): ?>
+        <br>
+        <?= $this->Html->link('View Reason', ['action' => 'viewReason', $borrowRequest->id], ['class' => 'view-reason-link']) ?>
+    <?php endif; ?>
+
+    <?php if ($status === 'overdue' && $borrowRequest->return_date && $borrowRequest->return_time): ?>
+        <?php
+            $due = new DateTime($borrowRequest->return_date->format('Y-m-d') . ' ' . $borrowRequest->return_time->format('H:i:s'));
+            $now = new DateTime();
+            $interval = $now->diff($due);
+            echo "<br><small style='color:red;'>Overdue by {$interval->days}d {$interval->h}h {$interval->i}m</small>";
+        ?>
+    <?php endif; ?>
+</td>
+
                     <td><?= h($borrowRequest->request_date) ?></td>
                     <td><?= h($borrowRequest->return_date) ?></td>
                     <td><?= h($borrowRequest->return_time ?? 'N/A') ?></td>
@@ -110,3 +134,24 @@
         <p><?= $this->Paginator->counter(__('Page {{page}} of {{pages}}, showing {{current}} record(s) out of {{count}} total')) ?></p>
     </div>
 </div>
+
+<!-- 🔍 JavaScript for Filtering -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const statusFilter = document.getElementById('statusFilter');
+        const rows = document.querySelectorAll('#borrowRequestsTable tbody tr');
+
+        statusFilter.addEventListener('change', function () {
+            const selectedStatus = this.value.toLowerCase();
+
+            rows.forEach(row => {
+                const statusCell = row.querySelector('.status-cell');
+                if (!statusCell) return;
+
+                const text = statusCell.textContent.toLowerCase();
+                const match = selectedStatus === '' || text.includes(selectedStatus);
+                row.style.display = match ? '' : 'none';
+            });
+        });
+    });
+</script>

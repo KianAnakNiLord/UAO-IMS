@@ -8,7 +8,8 @@ use Dompdf\Options;
 use Cake\Mailer\Mailer;
 use Cake\Log\Log;
 use Cake\Routing\Router;
-
+use Cake\Datasource\ConnectionManager;
+use Cake\Database\Log\QueryLogger;
 /**
  * @property \App\Model\Table\BorrowRequestsTable $BorrowRequests
  * @property \App\Model\Table\UsersTable $Users
@@ -204,43 +205,63 @@ public function inventory()
     $this->autoMarkOverdue();
 
     $request = $this->BorrowRequests->get($id, ['contain' => ['Users', 'InventoryItems']]);
-    $request->status = 'approved';
 
-    $item = $request->inventory_item;
-    $item->quantity -= $request->quantity_requested;
-    $item->setDirty('quantity', true); // ✅ REQUIRED!
+    if ($this->request->is(['post', 'put'])) {
+        $request->status = 'approved';
 
-    $saveRequest = $this->BorrowRequests->save($request);
-    $saveItem = $this->fetchTable('InventoryItems')->save($item); // or just use $this->InventoryItems if already fetched
-
-    if ($saveRequest && $saveItem) {
-        $this->Flash->success('Request approved successfully and inventory updated.');
-
-        // ✅ Send email
-        if ($request->user && $item) {
-            $user = $request->user;
-            $mailer = new Mailer('default');
-
-            $emailResult = $mailer->setFrom(['noreply@uao-ims.test' => 'UAO IMS'])
-                ->setTo($user->email)
-                ->setSubject('Borrow Request Approved')
-                ->deliver(
-                    "Hello {$user->name},\n\n" .
-                    "Your borrow request for \"{$item->name}\" has been approved.\n\n" .
-                    "Please return the item by {$request->return_date} at {$request->return_time}.\n\n" .
-                    "Thank you,\nUAO Inventory Team"
-                );
-
-            echo "<script>alert('📧 Email sent to {$user->email}');</script>";
-        } else {
-            echo "<script>alert('❌ Email not sent — missing user or item info.');</script>";
+        // ✅ Optional note from the approve_form
+        $approvalNote = trim((string) $this->request->getData('approval_note'));
+        if (strlen($approvalNote) > 75) {
+            $this->Flash->error('Approval note must not exceed 75 characters.');
+            return $this->redirect(['action' => 'approveRequest', $id]);
         }
-    } else {
-        $this->Flash->error('Could not approve request or update inventory.');
+
+        $request->approval_note = $approvalNote;
+
+        // ✅ Deduct inventory
+        $item = $request->inventory_item;
+        $item->quantity -= $request->quantity_requested;
+        $item->setDirty('quantity', true); // Required
+
+        $saveRequest = $this->BorrowRequests->save($request);
+        $saveItem = $this->fetchTable('InventoryItems')->save($item);
+
+        if ($saveRequest && $saveItem) {
+            $this->Flash->success('Request approved successfully and inventory updated.');
+
+            // ✅ Send email
+            if ($request->user && $item) {
+                $user = $request->user;
+                $mailer = new Mailer('default');
+
+                $noteLine = $approvalNote ? "\n\nAdmin Note: {$approvalNote}" : '';
+
+                $mailer->setFrom(['noreply@uao-ims.test' => 'UAO IMS'])
+                    ->setTo($user->email)
+                    ->setSubject('Borrow Request Approved')
+                    ->deliver(
+                        "Hello {$user->name},\n\n" .
+                        "Your borrow request for \"{$item->name}\" has been approved.\n" .
+                        "Please return the item by {$request->return_date} at {$request->return_time}." .
+                        "{$noteLine}\n\nThank you,\nUAO Inventory Team"
+                    );
+
+                echo "<script>alert('📧 Email sent to {$user->email}');</script>";
+            } else {
+                echo "<script>alert('❌ Email not sent — missing user or item info.');</script>";
+            }
+        } else {
+            $this->Flash->error('Could not approve request or update inventory.');
+        }
+
+        return $this->redirect(['action' => 'borrowRequests']);
     }
 
-    return $this->redirect(['action' => 'borrowRequests']);
+    // Initial GET request shows form
+    $this->set(compact('request'));
+    $this->render('approve_form');
 }
+
 
 public function rejectRequest($id = null)
 {
@@ -248,8 +269,15 @@ public function rejectRequest($id = null)
 
     if ($this->request->is(['post', 'put'])) {
         $data = $this->request->getData();
+        $rejectionReason = trim((string) $data['rejection_reason']);
+
+        if (strlen($rejectionReason) > 75) {
+            $this->Flash->error('Rejection reason must not exceed 75 characters.');
+            return $this->redirect(['action' => 'rejectRequest', $id]);
+        }
+
         $request->status = 'rejected';
-        $request->rejection_reason = $data['rejection_reason'];
+        $request->rejection_reason = $rejectionReason;
 
         if ($this->BorrowRequests->save($request)) {
             $this->Flash->success('Request rejected with reason.');
@@ -266,7 +294,7 @@ public function rejectRequest($id = null)
                     ->deliver(
                         "Hello {$user->name},\n\n" .
                         "Your borrow request for \"{$item->name}\" has been rejected.\n\n" .
-                        "Reason: {$request->rejection_reason}\n\n" .
+                        "Reason: {$rejectionReason}\n\n" .
                         "Please contact the UAO office if you need further assistance.\n\n" .
                         "Thank you,\nUAO Inventory Team"
                     );
@@ -285,6 +313,7 @@ public function rejectRequest($id = null)
 
     return $this->redirect(['action' => 'borrowRequests']);
 }
+
 
 
     public function rejectForm($id)
@@ -370,55 +399,97 @@ public function markAsReturned($id = null)
     $request = $this->BorrowRequests->get($id);
 
     if ($this->request->is(['post', 'put'])) {
+        // ✅ Setup Query Logger
+        $logger = new \Cake\Database\Log\QueryLogger();
+        $connection = ConnectionManager::get('default');
+        $driver = $connection->getDriver();
+
+        if (method_exists($driver, 'setLogger')) {
+            $driver->setLogger($logger);
+        }
+
         $data = $this->request->getData();
         $returnedGood = (int)$data['returned_quantity'];
         $returnedDamaged = (int)$data['damaged_quantity'];
-
         $totalReturned = $returnedGood + $returnedDamaged;
 
-        // Clamp to not exceed what was borrowed
         if ($totalReturned > $request->quantity_requested) {
             $this->Flash->error('Total returned quantity exceeds what was borrowed.');
             return $this->redirect(['action' => 'markAsReturned', $id]);
         }
 
-        $request->status = 'returned';
-        $request->returned_good = $returnedGood;
-        $request->returned_damaged = $returnedDamaged;
-        $request->return_remark = "Returned: {$returnedGood} good" . ($returnedDamaged > 0 ? ", {$returnedDamaged} damaged" : "");
+        $originalStatus = $request->status;
 
-        $inventoryTable = $this->fetchTable('InventoryItems');
-        $item = $inventoryTable->get($request->inventory_item_id);
-        $item->quantity += $returnedGood; // only increase inventory with good items
-        $item->setDirty('quantity', true);
+        // ✅ Calculate overdue duration
+        $duration = null;
+        if ($originalStatus === 'overdue' && $request->return_date && $request->return_time) {
+            $due = new \DateTime($request->return_date->format('Y-m-d') . ' ' . $request->return_time->format('H:i:s'));
+            $returnedAt = new \DateTime();
 
-        if (
-            $this->BorrowRequests->save($request) &&
-            $inventoryTable->save($item)
-        ) {
-            $this->Flash->success("Marked as returned. Inventory updated with {$returnedGood} good item(s).");
+            if ($returnedAt > $due) {
+                $interval = $due->diff($returnedAt);
+                $duration = "{$interval->days} day(s), {$interval->h} hour(s), {$interval->i} min(s)";
+                debug("Setting overdue duration: $duration");
+                \Cake\Log\Log::write('debug', "⏱ overdue_duration set to: $duration");
+            } else {
+                debug("Not overdue anymore.");
+                \Cake\Log\Log::write('debug', "Returned on time. No overdue_duration set.");
+            }
         } else {
-            $this->Flash->error("Failed to update inventory or borrow request.");
+            \Cake\Log\Log::write('debug', "Not previously overdue or missing return date/time.");
         }
 
-        if (
-    !$this->BorrowRequests->save($request)
-) {
-    $this->Flash->error("Borrow request save failed: " . json_encode($request->getErrors()));
-    return $this->redirect(['action' => 'approvedRequests']);
-}
+        // ✅ Patch entity
+        $this->BorrowRequests->patchEntity($request, [
+            
+            'status' => 'returned',
+            'returned_good' => $returnedGood,
+            'returned_damaged' => $returnedDamaged,
+            'return_remark' => "Returned: {$returnedGood} good" . ($returnedDamaged > 0 ? ", {$returnedDamaged} damaged" : ""),
+            'quantity' => $totalReturned,
+            'overdue_duration' => $duration
+        ]);
+        $request->setDirty('overdue_duration', true);
+        // ✅ Inventory update
+        $inventoryTable = $this->fetchTable('InventoryItems');
+        $item = $inventoryTable->get($request->inventory_item_id);
+        $item->quantity += $returnedGood;
+        $item->setDirty('quantity', true);
 
-if (!$inventoryTable->save($item)) {
-    $this->Flash->error("Inventory save failed: " . json_encode($item->getErrors()));
-    return $this->redirect(['action' => 'approvedRequests']);
-}
+        debug($request);
+        debug('FINAL TO SAVE: ' . json_encode($request->toArray()));
+        debug($request->getErrors());
 
+        // ✅ Save the request
+        if (!$this->BorrowRequests->save($request)) {
+            $reflection = new \ReflectionClass($logger);
+            if ($reflection->hasProperty('_queries')) {
+                $prop = $reflection->getProperty('_queries');
+                $prop->setAccessible(true);
+                $queries = $prop->getValue($logger);
+                debug("❌ SQL QUERY LOG:");
+                debug(end($queries));
+            }
 
+            \Cake\Log\Log::write('error', '❌ Failed to save BorrowRequest: ' . json_encode($request->getErrors()));
+            $this->Flash->error("Borrow request save failed: " . json_encode($request->getErrors()));
+            return $this->redirect(['action' => 'approvedRequests']);
+        }
+
+        // ✅ Save the inventory item
+        if (!$inventoryTable->save($item)) {
+            $this->Flash->error("Inventory save failed: " . json_encode($item->getErrors()));
+            return $this->redirect(['action' => 'approvedRequests']);
+        }
+
+        $this->Flash->success("Marked as returned. Inventory updated with {$returnedGood} good item(s).");
         return $this->redirect(['action' => 'approvedRequests']);
     }
 
     $this->set(compact('request'));
 }
+
+
 
 
 public function markAsOverdue($id = null)

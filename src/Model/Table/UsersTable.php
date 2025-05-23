@@ -8,6 +8,7 @@ use Cake\ORM\RulesChecker;
 use Cake\Validation\Validator;
 use Cake\Log\Log;
 use Cake\ORM\Query\SelectQuery;
+use Cake\Http\Exception\ForbiddenException;
 
 /**
  * Users Model
@@ -105,8 +106,9 @@ public function findOrCreateFromSocial($data)
 
     // ✅ Domain restriction
     if (!str_ends_with($data['email'], '@my.xu.edu.ph')) {
-        throw new \RuntimeException('Only @my.xu.edu.ph emails are allowed.');
-    }
+    // Custom 403 with themed layout support
+    throw new ForbiddenException('Only @my.xu.edu.ph emails are allowed.');
+}
 
     $provider = strtolower($data['provider'] ?? 'google');
     $identifier = (string)($data['identifier'] ?? '');
