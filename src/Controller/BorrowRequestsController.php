@@ -49,16 +49,21 @@ class BorrowRequestsController extends AppController
                         $item = $request->inventory_item;
 
                         $mailer = new Mailer('default');
-                        $mailer->setFrom(['noreply@uao-ims.test' => 'UAO IMS'])
+                        $mailer->setEmailFormat('html')
+                            ->setFrom(['noreply@uao-ims.test' => 'UAO IMS'])
                             ->setTo($user->email)
                             ->setSubject('Borrow Request Overdue')
-                            ->deliver(
-                                "Hello {$user->name},\n\n" .
-                                "Your borrow request for \"{$item->name}\" is now marked as OVERDUE.\n\n" .
-                                "Return Due: {$request->return_date->format('Y-m-d')} at {$request->return_time->format('H:i')}\n\n" .
-                                "Please return the item immediately to avoid any further issues.\n\n" .
-                                "Thank you,\nUAO Inventory Team"
-                            );
+                            ->viewBuilder()
+                                ->setTemplate('overdue_email')
+                                ->setLayout('custom');
+
+                        $mailer->setViewVars([
+                            'user' => $user,
+                            'item' => $item,
+                            'request' => $request
+                        ]);
+
+                        $mailer->deliver();
                     }
                 }
             }
@@ -81,6 +86,7 @@ class BorrowRequestsController extends AppController
     $borrowRequests = $this->paginate($query);
     $this->set(compact('borrowRequests'));
 }
+
 
    // ✅ Borrower - Submit Request
     // ✅ Borrower - Submit Request

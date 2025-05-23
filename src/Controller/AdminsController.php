@@ -208,20 +208,17 @@ public function inventory()
 
     if ($this->request->is(['post', 'put'])) {
         $request->status = 'approved';
-
-        // ✅ Optional note from the approve_form
         $approvalNote = trim((string) $this->request->getData('approval_note'));
+
         if (strlen($approvalNote) > 75) {
             $this->Flash->error('Approval note must not exceed 75 characters.');
             return $this->redirect(['action' => 'approveRequest', $id]);
         }
 
         $request->approval_note = $approvalNote;
-
-        // ✅ Deduct inventory
         $item = $request->inventory_item;
         $item->quantity -= $request->quantity_requested;
-        $item->setDirty('quantity', true); // Required
+        $item->setDirty('quantity', true);
 
         $saveRequest = $this->BorrowRequests->save($request);
         $saveItem = $this->fetchTable('InventoryItems')->save($item);
@@ -229,26 +226,27 @@ public function inventory()
         if ($saveRequest && $saveItem) {
             $this->Flash->success('Request approved successfully and inventory updated.');
 
-            // ✅ Send email
             if ($request->user && $item) {
                 $user = $request->user;
+
                 $mailer = new Mailer('default');
-
-                $noteLine = $approvalNote ? "\n\nAdmin Note: {$approvalNote}" : '';
-
-                $mailer->setFrom(['noreply@uao-ims.test' => 'UAO IMS'])
+                $mailer->setEmailFormat('html')
+                    ->setFrom(['noreply@uao-ims.test' => 'UAO IMS'])
                     ->setTo($user->email)
                     ->setSubject('Borrow Request Approved')
-                    ->deliver(
-                        "Hello {$user->name},\n\n" .
-                        "Your borrow request for \"{$item->name}\" has been approved.\n" .
-                        "Please return the item by {$request->return_date} at {$request->return_time}." .
-                        "{$noteLine}\n\nThank you,\nUAO Inventory Team"
-                    );
+                    ->viewBuilder()
+                        ->setTemplate('approved_email')
+                        ->setLayout('custom');
 
-                echo "<script>alert('📧 Email sent to {$user->email}');</script>";
-            } else {
-                echo "<script>alert('❌ Email not sent — missing user or item info.');</script>";
+                $mailer->setViewVars([
+                    'user' => $user,
+                    'item' => $item,
+                    'request' => $request,
+                    'note' => $approvalNote
+                ]);
+
+                $mailer->deliver();
+                echo "<script>alert('📧 Styled approval email sent to {$user->email}');</script>";
             }
         } else {
             $this->Flash->error('Could not approve request or update inventory.');
@@ -257,7 +255,6 @@ public function inventory()
         return $this->redirect(['action' => 'borrowRequests']);
     }
 
-    // Initial GET request shows form
     $this->set(compact('request'));
     $this->render('approve_form');
 }
@@ -282,28 +279,29 @@ public function rejectRequest($id = null)
         if ($this->BorrowRequests->save($request)) {
             $this->Flash->success('Request rejected with reason.');
 
-            // ✅ Send rejection email
             if ($request->user && $request->inventory_item) {
                 $user = $request->user;
                 $item = $request->inventory_item;
 
                 $mailer = new Mailer('default');
-                $mailer->setFrom(['noreply@uao-ims.test' => 'UAO IMS'])
+                $mailer->setEmailFormat('html')
+                    ->setFrom(['noreply@uao-ims.test' => 'UAO IMS'])
                     ->setTo($user->email)
                     ->setSubject('Borrow Request Rejected')
-                    ->deliver(
-                        "Hello {$user->name},\n\n" .
-                        "Your borrow request for \"{$item->name}\" has been rejected.\n\n" .
-                        "Reason: {$rejectionReason}\n\n" .
-                        "Please contact the UAO office if you need further assistance.\n\n" .
-                        "Thank you,\nUAO Inventory Team"
-                    );
+                    ->viewBuilder()
+                        ->setTemplate('rejected_email')
+                        ->setLayout('custom');
 
-                echo "<script>alert('📧 Rejection email sent to {$user->email}');</script>";
-            } else {
-                echo "<script>alert('❌ Email not sent — missing user or item info.');</script>";
+                // ✅ FIXED: match the variable name expected in the template
+                $mailer->setViewVars([
+                    'user' => $user,
+                    'item' => $item,
+                    'rejectionReason' => $rejectionReason
+                ]);
+
+                $mailer->deliver();
+                echo "<script>alert('📧 Styled rejection email sent to {$user->email}');</script>";
             }
-
         } else {
             $this->Flash->error('Could not reject the request.');
         }
@@ -313,6 +311,8 @@ public function rejectRequest($id = null)
 
     return $this->redirect(['action' => 'borrowRequests']);
 }
+
+
 
 
 
@@ -399,15 +399,6 @@ public function markAsReturned($id = null)
     $request = $this->BorrowRequests->get($id);
 
     if ($this->request->is(['post', 'put'])) {
-        // ✅ Setup SQL Query Logger
-        $logger = new \Cake\Database\Log\QueryLogger();
-        $connection = \Cake\Datasource\ConnectionManager::get('default');
-        $driver = $connection->getDriver();
-
-        if (method_exists($driver, 'setLogger')) {
-            $driver->setLogger($logger);
-        }
-
         $data = $this->request->getData();
         $returnedGood = (int)$data['returned_quantity'];
         $returnedDamaged = (int)$data['damaged_quantity'];
@@ -419,9 +410,8 @@ public function markAsReturned($id = null)
         }
 
         $originalStatus = $request->status;
-
-        // ✅ Calculate overdue duration
         $duration = null;
+
         if ($originalStatus === 'overdue' && $request->return_date && $request->return_time) {
             $due = new \DateTime($request->return_date->format('Y-m-d') . ' ' . $request->return_time->format('H:i:s'));
             $returnedAt = new \DateTime();
@@ -429,17 +419,9 @@ public function markAsReturned($id = null)
             if ($returnedAt > $due) {
                 $interval = $due->diff($returnedAt);
                 $duration = "{$interval->days} day(s), {$interval->h} hour(s), {$interval->i} min(s)";
-                debug("Setting overdue duration: $duration");
-                \Cake\Log\Log::write('debug', "⏱ overdue_duration set to: $duration");
-            } else {
-                debug("Not overdue anymore.");
-                \Cake\Log\Log::write('debug', "Returned on time. No overdue_duration set.");
             }
-        } else {
-            \Cake\Log\Log::write('debug', "Not previously overdue or missing return date/time.");
         }
 
-        // ✅ Patch basic fields
         $this->BorrowRequests->patchEntity($request, [
             'status' => 'returned',
             'returned_good' => $returnedGood,
@@ -448,39 +430,21 @@ public function markAsReturned($id = null)
             'quantity' => $totalReturned
         ]);
 
-        // ✅ Force overdue_duration directly
         $request->overdue_duration = $duration;
         $request->setDirty('overdue_duration', true);
 
-        // ✅ Inventory update
         $inventoryTable = $this->fetchTable('InventoryItems');
         $item = $inventoryTable->get($request->inventory_item_id);
         $item->quantity += $returnedGood;
         $item->setDirty('quantity', true);
 
-        debug($request);
-        debug('FINAL TO SAVE: ' . json_encode($request->toArray()));
-        debug($request->getErrors());
-
-        // ✅ Save the borrow request
         if (!$this->BorrowRequests->save($request)) {
-            $reflection = new \ReflectionClass($logger);
-            if ($reflection->hasProperty('_queries')) {
-                $prop = $reflection->getProperty('_queries');
-                $prop->setAccessible(true);
-                $queries = $prop->getValue($logger);
-                debug("❌ SQL QUERY LOG:");
-                debug(end($queries)); // show only the last
-            }
-
-            \Cake\Log\Log::write('error', '❌ Failed to save BorrowRequest: ' . json_encode($request->getErrors()));
-            $this->Flash->error("Borrow request save failed: " . json_encode($request->getErrors()));
+            $this->Flash->error("Borrow request save failed.");
             return $this->redirect(['action' => 'approvedRequests']);
         }
 
-        // ✅ Save the inventory item
         if (!$inventoryTable->save($item)) {
-            $this->Flash->error("Inventory save failed: " . json_encode($item->getErrors()));
+            $this->Flash->error("Inventory save failed.");
             return $this->redirect(['action' => 'approvedRequests']);
         }
 
@@ -593,7 +557,7 @@ private function autoMarkOverdue(): void
 
     foreach ($requests as $request) {
         if (
-            $request->status !== 'approved' || // ✅ Extra safety
+            $request->status !== 'approved' ||
             !$request->return_date || 
             !$request->return_time
         ) {
@@ -611,17 +575,22 @@ private function autoMarkOverdue(): void
                     $user = $request->user;
                     $item = $request->inventory_item;
 
-                    (new Mailer('default'))
+                    $mailer = new Mailer('default');
+                    $mailer->setEmailFormat('html')
                         ->setFrom(['noreply@uao-ims.test' => 'UAO IMS'])
                         ->setTo($user->email)
                         ->setSubject('Borrow Request Overdue')
-                        ->deliver(
-                            "Hello {$user->name},\n\n" .
-                            "Your borrow request for \"{$item->name}\" is now marked as OVERDUE.\n\n" .
-                            "Return Due: {$request->return_date->format('Y-m-d')} at {$request->return_time->format('H:i')}\n\n" .
-                            "Please return the item immediately to avoid any further issues.\n\n" .
-                            "Thank you,\nUAO Inventory Team"
-                        );
+                        ->viewBuilder()
+                            ->setTemplate('overdue_email')
+                            ->setLayout('custom');
+
+                    $mailer->setViewVars([
+                        'user' => $user,
+                        'item' => $item,
+                        'request' => $request
+                    ]);
+
+                    $mailer->deliver();
                 }
             }
         }
