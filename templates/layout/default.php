@@ -35,6 +35,7 @@ $role = $identity ? $identity->get('role') : null;
                     <?= $this->Html->link('Borrow Requests', '/admins/borrowRequests', ['class' => 'nav-item']) ?>
                     <?= $this->Html->link('Approved Requests', '/admins/approvedRequests', ['class' => 'nav-item']) ?>
                     <?= $this->Html->link('Borrow History', '/admins/history', ['class' => 'nav-item']) ?>
+                    <?= $this->Html->link('Manage Users', ['controller' => 'Users', 'action' => 'index'], ['class' => 'nav-item']) ?>
                 <?php elseif ($role === 'borrower'): ?>
                     <?= $this->Html->link('Dashboard', '/borrowers/dashboard', ['class' => 'nav-item']) ?>
                     <?= $this->Html->link('New Borrow Request', '/borrowRequests/add', ['class' => 'nav-item']) ?>

@@ -1,118 +1,168 @@
-/* ================================
-   🧾 Borrower Dashboard – Unified UI Style
-   ================================ */
+/* ==========================================
+   🎓 Borrower Profile Dashboard – Premium UI
+   ========================================== */
 
 body {
     font-family: 'Segoe UI', sans-serif;
     background-color: #f5f7fa;
+    color: #333;
     margin: 0;
-    padding: 0;
+    padding: 60px 80px;
+    line-height: 1.6;
 }
 
-/* Main Container */
-.dashboard-container {
-    max-width: 1300px;
-    margin: 40px auto;
-    padding: 40px;
-    background: #ffffff;
-    border-radius: 16px;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+/* Header Title */
+.dashboard-title {
+    font-size: 38px;
+    font-weight: 700;
     color: #3A53A4;
-    border-top: 6px solid #B99433;
-}
-
-/* Title */
-.dashboard-container h1 {
-    font-size: 28px;
-    font-weight: bold;
-    color: #3A53A4;
-    margin-bottom: 30px;
+    margin-bottom: 10px;
     border-left: 6px solid #B99433;
-    padding-left: 15px;
+    padding-left: 16px;
+    letter-spacing: 0.4px;
+    line-height: 1.2;
 }
 
-/* Greeting */
+/* Welcome Greeting */
 .greeting {
-    text-align: center;
-    font-size: 17px;
+    font-size: 18px;
     color: #3A53A4;
-    margin-bottom: 30px;
+    margin-bottom: 50px;
     font-weight: 500;
+    padding-left: 6px;
 }
 
-/* Section Cards */
-.section {
-    margin-bottom: 30px;
-    padding: 25px 30px;
-    background: #f9f9fc;
+/* Profile Sections */
+.profile-block {
+    margin-bottom: 60px;
+    padding: 25px 35px;
+    background: #ffffff;
     border-left: 6px solid #B99433;
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04);
+    transition: all 0.3s ease;
 }
 
-/* Section Headings */
-.section h2 {
-    font-size: 20px;
-    margin-bottom: 15px;
+.profile-block:hover {
+    transform: translateY(-2px);
+}
+
+/* Section Heading with Emoji Icon */
+.profile-block h2 {
+    font-size: 24px;
+    font-weight: 600;
     color: #3A53A4;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
-/* Content Paragraphs */
-.section p,
-.section ol {
-    font-size: 15px;
-    line-height: 1.7;
+/* Paragraph Text */
+.profile-block p {
+    font-size: 16px;
+    margin: 6px 0;
     color: #333;
+    line-height: 1.8;
 }
 
-.section ol {
-    padding-left: 20px;
+/* Ordered List Styling */
+.profile-block ol {
+    padding-left: 25px;
+    margin-top: 10px;
+    color: #333;
+    font-size: 15px;
+    counter-reset: list;
 }
 
-.section ol li::marker {
+.profile-block ol li {
+    margin-bottom: 12px;
+    position: relative;
+    padding-left: 10px;
+}
+
+.profile-block ol li::marker {
     color: #B99433;
     font-weight: bold;
 }
 
-/* Image Styling */
-.uao-image img {
-    width: 100%;
-    max-width: 100%;
-    border-radius: 10px;
-    border: 2px solid #ccc;
-    margin-top: 15px;
-}
-
-/* Contact Links */
-.uao-contact a {
+/* Links */
+.profile-block a {
     color: #3A53A4;
     font-weight: 500;
     text-decoration: underline;
+    transition: all 0.2s ease;
 }
-
-.uao-contact a:hover {
-    color: #2f418a;
+.profile-block a:hover {
+    color: #B99433;
     text-decoration: none;
 }
 
-/* Logout Section */
-.section.logout {
-    text-align: center;
+/* Profile Image */
+.uao-photo {
+    width: 100%;
+    max-width: 650px;
+    height: auto;
+    border-radius: 10px;
+    border: 2px solid #dcdcdc;
+    margin-top: 20px;
+    transition: transform 0.3s ease;
+}
+.uao-photo:hover {
+    transform: scale(1.02);
 }
 
-.btn.logout {
-    background-color: #dc3545;
-    color: white;
-    padding: 12px 24px;
-    border: none;
-    border-radius: 8px;
-    font-size: 15px;
-    font-weight: bold;
-    text-decoration: none;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+/* Divider (optional aesthetic) */
+.profile-block + .profile-block::before {
+    content: "";
+    display: block;
+    height: 1px;
+    width: 100%;
+    background-color: #e0e0e0;
+    margin: 50px 0 30px;
 }
 
-.btn.logout:hover {
-    background-color: #bd2130;
+/* Label Highlights */
+.profile-block strong {
+    color: #111;
+    font-weight: 600;
+}
+
+/* Responsive Enhancements */
+@media (max-width: 1024px) {
+    body {
+        padding: 40px 40px;
+    }
+    .dashboard-title {
+        font-size: 30px;
+    }
+    .profile-block h2 {
+        font-size: 20px;
+    }
+    .profile-block {
+        padding: 20px 25px;
+    }
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 25px 15px;
+    }
+
+    .dashboard-title {
+        font-size: 26px;
+    }
+
+    .greeting {
+        font-size: 15px;
+        margin-bottom: 30px;
+    }
+
+    .profile-block {
+        margin-bottom: 40px;
+    }
+
+    .uao-photo {
+        max-width: 100%;
+    }
 }

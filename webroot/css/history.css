@@ -4,14 +4,15 @@
 
 /* Overall Page Container */
 .history-container {
-    max-width: 1300px;
-    margin: 40px auto;
     padding: 40px;
-    background-color: #ffffff;
-    border-radius: 16px;
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+    margin: 0;
+    max-width: 100%;
+    background-color: transparent;
+    border-radius: 0;
+    box-shadow: none;
     border-top: 6px solid #B99433;
 }
+
 
 /* Title Styling */
 .history-title {

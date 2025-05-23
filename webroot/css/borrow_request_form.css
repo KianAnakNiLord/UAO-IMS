@@ -9,13 +9,14 @@
 
 /* Layout */
 .borrowRequests.form.content {
-    background: #fff;
     padding: 40px;
-    margin: 40px auto;
-    border-radius: 10px;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.07);
-    max-width: 700px;
+    margin: 0;
+    max-width: 100%;
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
 }
+
 
 legend {
     font-size: 24px;

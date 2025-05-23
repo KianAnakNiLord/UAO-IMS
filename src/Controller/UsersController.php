@@ -28,14 +28,24 @@ class UsersController extends AppController
     }
 
     public function beforeFilter(EventInterface $event)
-    {
-        parent::beforeFilter($event);
+{
+    parent::beforeFilter($event);
 
-        // Allow non-authenticated users to access login and register
-        $this->Authentication->addUnauthenticatedActions([
-    'login', 'register', 'verifyOtp', 'googleLogin', 'googleLoginCallback', 'logtest'
-]);
+    $this->Authentication->addUnauthenticatedActions([
+        'login', 'register', 'verifyOtp', 'googleLogin', 'googleLoginCallback', 'logtest'
+    ]);
+
+    // 🛡️ Restrict access to admin-only actions
+    $user = $this->Authentication->getIdentity();
+    $adminActions = ['index', 'view', 'add', 'edit', 'delete'];
+
+    if (in_array($this->request->getParam('action'), $adminActions)) {
+        if (!$user || $user->get('role') !== 'admin') {
+            $this->Flash->error('Unauthorized access.');
+            return $this->redirect('/');
+        }
     }
+}
 
 
 public function login()
