@@ -108,3 +108,22 @@
         <?php endforeach; ?>
     </tbody>
 </table>
+<div class="inventory-pagination">
+    <div class="pagination-wrapper">
+        <?= $this->Paginator->first('«', ['class' => 'pagination-link']) ?>
+        <?= $this->Paginator->prev('‹', ['class' => 'pagination-link']) ?>
+        <?= $this->Paginator->numbers([
+            'class' => 'pagination-link',
+            'currentClass' => 'active'
+        ]) ?>
+        <?= $this->Paginator->next('›', ['class' => 'pagination-link']) ?>
+        <?= $this->Paginator->last('»', ['class' => 'pagination-link']) ?>
+    </div>
+
+    <p class="pagination-counter">
+        <?= $this->Paginator->counter('Page {{page}} of {{pages}}, showing {{current}} of {{count}} total') ?>
+    </p>
+</div>
+
+
+

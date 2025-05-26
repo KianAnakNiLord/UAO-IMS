@@ -259,3 +259,49 @@ table td .danger-btn:hover {
 .condition-damaged {
     background-color: #dc3545;
 }
+
+.inventory-pagination {
+    text-align: center;
+    margin: 40px 0 20px;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.pagination-wrapper {
+    display: inline-flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+
+.pagination-link {
+    display: inline-block;
+    padding: 8px 14px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    color: #3A53A4;
+    border: 2px solid #3A53A4;
+    border-radius: 6px;
+    background-color: #fff;
+    transition: all 0.2s ease-in-out;
+}
+
+.pagination-link:hover {
+    background-color: #3A53A4;
+    color: white;
+}
+
+.pagination-link.active {
+    background-color: #B99433;
+    border-color: #B99433;
+    color: white;
+    pointer-events: none;
+}
+
+.pagination-counter {
+    font-size: 14px;
+    color: #333;
+    margin-top: 6px;
+}
+

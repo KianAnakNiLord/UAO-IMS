@@ -21,7 +21,6 @@ class AdminsController extends AppController
     {
         parent::initialize();
 
-        // ✅ Use fetchTable instead of loadModel in CakePHP 5+
         $this->BorrowRequests = $this->fetchTable('BorrowRequests');
         $this->Users = $this->fetchTable('Users');
         $this->InventoryItems = $this->fetchTable('InventoryItems');
@@ -33,14 +32,12 @@ class AdminsController extends AppController
 {
     $user = $this->request->getAttribute('identity');
 
-    // Quick statistics
     $totalItems = $this->InventoryItems->find()->count();
     $pendingRequests = $this->BorrowRequests->find()->where(['status' => 'pending'])->count();
     $approvedRequests = $this->BorrowRequests->find()->where(['status' => 'approved'])->count();
     $returnedRequests = $this->BorrowRequests->find()->where(['status' => 'returned'])->count();
     $overdueRequests = $this->BorrowRequests->find()->where(['status' => 'overdue'])->count();
 
-    // Upcoming returns within 3 days
     $upcomingReturns = $this->BorrowRequests->find()
     ->contain(['Users', 'InventoryItems'])
     ->where([
@@ -50,7 +47,7 @@ class AdminsController extends AppController
     ])
     ->order(['return_date' => 'ASC'])
     ->limit(5)
-    ->all(); // 👈 This makes it a result set so you can use isEmpty()
+    ->all();
 
 
     $this->set(compact(
@@ -96,7 +93,6 @@ public function inventory()
         ->leftJoinWith('BorrowRequests')
         ->group(['InventoryItems.id']);
 
-    // Filtering
     $search = $this->request->getQuery('search');
     $category = $this->request->getQuery('category');
     $condition = $this->request->getQuery('condition');
@@ -120,7 +116,9 @@ public function inventory()
         $query->where(['InventoryItems.location' => $location]);
     }
 
+    $this->paginate = ['limit' => 15];
     $inventoryItems = $this->paginate($query);
+
     $this->set(compact('inventoryItems', 'search', 'category', 'condition', 'location'));
 }
 
@@ -164,7 +162,6 @@ public function inventory()
 
     $item = $this->InventoryItems->get($id);
 
-    // Check if there are any linked borrow requests with pending or approved status
     $linkedRequests = $this->BorrowRequests
         ->find()
         ->where([
@@ -194,7 +191,7 @@ public function inventory()
         $requests = $this->BorrowRequests
             ->find('all')
             ->contain(['Users', 'InventoryItems'])
-            ->where(['BorrowRequests.status' => 'pending']) // Only show pending borrow requests
+            ->where(['BorrowRequests.status' => 'pending']) 
             ->order(['BorrowRequests.created' => 'DESC']);
 
         $this->set('borrowRequests', $requests);
@@ -219,7 +216,6 @@ public function inventory()
         $request->approval_note = $approvalNote;
         $item = $request->inventory_item;
 
-        // ✅ NEW: Prevent over-approval with safe inventory check
         $query = $this->BorrowRequests->find();
         $approvedQtyResult = $query
             ->select([
@@ -242,7 +238,6 @@ return $this->render('approve_form');
 
         }
 
-        // ✅ Proceed if enough inventory
         $item->quantity -= $requestedQty;
         $item->setDirty('quantity', true);
 
@@ -317,7 +312,6 @@ public function rejectRequest($id = null)
                         ->setTemplate('rejected_email')
                         ->setLayout('custom');
 
-                // ✅ FIXED: match the variable name expected in the template
                 $mailer->setViewVars([
                     'user' => $user,
                     'item' => $item,
@@ -345,14 +339,12 @@ public function rejectRequest($id = null)
     {
         $this->autoMarkOverdue();
 
-        $user = $this->request->getAttribute('identity'); // Get the logged-in user
+        $user = $this->request->getAttribute('identity'); 
 
-        // Redirect to the login page if the user is not authenticated or not an admin
         if (!$user || $user->role !== 'admin') {
             return $this->redirect(['controller' => 'Users', 'action' => 'login']);
         }
 
-        // Fetch borrow requests or any other data you need for the admin dashboard
         $borrowRequests = $this->BorrowRequests->find('all')
             ->contain(['Users', 'InventoryItems'])
             ->order(['created' => 'DESC']);
@@ -361,18 +353,15 @@ public function rejectRequest($id = null)
     }
     public function history()
 {
-    // Get search queries from GET
     $emailSearch = $this->request->getQuery('email');
     $nameSearch = $this->request->getQuery('name');
-    $onlyOverdue = $this->request->getQuery('only_overdue'); // ✅ new filter
+    $onlyOverdue = $this->request->getQuery('only_overdue'); 
 
-    // Build base query
     $query = $this->BorrowRequests->find()
         ->contain(['Users', 'InventoryItems'])
         ->where(['BorrowRequests.status IN' => ['approved', 'rejected', 'returned']])
         ->order(['BorrowRequests.created' => 'DESC']);
 
-    // Apply filters
     if (!empty($emailSearch)) {
         $query->where(['Users.email LIKE' => '%' . $emailSearch . '%']);
     }
@@ -380,38 +369,28 @@ public function rejectRequest($id = null)
     if (!empty($nameSearch)) {
         $query->where(['Users.name LIKE' => '%' . $nameSearch . '%']);
     }
-
-    // ✅ Filter: Only show records with overdue duration
     if ($onlyOverdue) {
         $query->where(function ($exp) {
             return $exp->isNotNull('BorrowRequests.overdue_duration')
                         ->notEq('BorrowRequests.overdue_duration', '');
         });
     }
-
-    // Paginate results
     $history = $this->paginate($query);
-
-    // Set for view
     $this->set(compact('history'));
 }
-
-
     public function approvedRequests()
 {
-    $user = $this->request->getAttribute('identity'); // Get the logged-in user
+    $user = $this->request->getAttribute('identity'); 
 
-    // Redirect to the login page if the user is not authenticated or not an admin
     if (!$user || $user->role !== 'admin') {
         return $this->redirect(['controller' => 'Users', 'action' => 'login']);
     }
 
-    // Fetch the approved borrow requests and avoid ambiguity by specifying the table for 'created'
     $approvedRequests = $this->BorrowRequests
         ->find('all')
         ->contain(['Users', 'InventoryItems'])
-        ->where(['BorrowRequests.status IN' => ['approved', 'overdue']]) // Filter approved requests
-        ->order(['BorrowRequests.created' => 'DESC']);  // Specify the table for the 'created' column
+        ->where(['BorrowRequests.status IN' => ['approved', 'overdue']]) 
+        ->order(['BorrowRequests.created' => 'DESC']); 
 
     $this->set(compact('approvedRequests'));
 }
@@ -455,7 +434,7 @@ public function markAsReturned($id = null)
             'status' => 'returned',
             'returned_good' => $returnedGood,
             'returned_damaged' => $returnedDamaged,
-            'return_remark' => $additionalRemark, // ✅ Use form input
+            'return_remark' => $additionalRemark, 
             'quantity' => $totalReturned
         ]);
 
@@ -483,23 +462,15 @@ public function markAsReturned($id = null)
 
     $this->set(compact('request'));
 }
-
-
-
-
-
 public function markAsOverdue($id = null)
 {
-    // Get the borrow request by ID
+
     $request = $this->BorrowRequests->get($id);
 
-    // Only allow if the request is POST or PUT
     if ($this->request->is(['post', 'put'])) {
-        // Mark as overdue
         $request->status = 'overdue';
         $request->return_remark = 'Marked overdue by admin';
 
-        // Save and give feedback
         if ($this->BorrowRequests->save($request)) {
             $this->Flash->success('Request marked as overdue.');
         } else {
@@ -507,7 +478,6 @@ public function markAsOverdue($id = null)
         }
     }
 
-    // Redirect back to Approved Requests page
     return $this->redirect(['action' => 'approvedRequests']);
 }
 
@@ -519,16 +489,14 @@ public function exportInventoryPdf()
     $this->viewBuilder()->disableAutoLayout();
     $this->viewBuilder()->setTemplate('pdf_inventory');
 
-    // ✅ Convert stream to string
     $html = (string) $this->render()->getBody();
 
     $options = new Options();
     $options->set('defaultFont', 'Arial');
-    $options->set('isRemoteEnabled', true); // ✅ enable remote loading
+    $options->set('isRemoteEnabled', true); 
 
     $dompdf = new Dompdf($options);
 
-    // ✅ Fix image path from local to full URL
     $baseUrl = Router::url('/', true);
     $html = str_replace(
         'src="' . WWW_ROOT . 'img/cruslogo.png"',
@@ -545,21 +513,17 @@ public function exportInventoryPdf()
         ->withHeader('Content-Disposition', 'attachment; filename="inventory_report.pdf"')
         ->withStringBody($dompdf->output());
 }
-
-
 public function beforeFilter(\Cake\Event\EventInterface $event)
 {
     parent::beforeFilter($event);
 
     $user = $this->request->getAttribute('identity');
 
-    // Block access if not admin
     if (!$user || $user->role !== 'admin') {
         $this->Flash->error('You are not authorized to access this page.');
         return $this->redirect(['controller' => 'Users', 'action' => 'login']);
     }
 }
-
 public function deleteHistory($id = null)
 {
     $this->request->allowMethod(['post', 'delete']);

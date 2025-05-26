@@ -55,6 +55,7 @@
                     <th><?= __('Return Date') ?></th>
                     <th><?= __('Return Time') ?></th>
                     <th><?= __('Overdue Duration') ?></th>
+                    <th><?= __('Returned Damaged') ?></th>
                     <th><?= __('Action') ?></th>
                 </tr>
             </thead>
@@ -75,12 +76,18 @@
                                         default => 'black'
                                     };
                                 ?>
-                                <span style="color: <?= $color ?>;"><?= ucfirst(h($status)) ?></span>
+                                <span style="color: <?= $color ?>;">
+                                    <?= ucfirst(h($status)) ?>
+                                    <?php if (!empty($borrowRequest->returned_damaged)): ?>
+                                        <span style="color: darkred;">(<?= h($borrowRequest->returned_damaged) ?> damaged)</span>
+                                    <?php endif; ?>
+                                </span>
                             </td>
                             <td><?= h($borrowRequest->request_date) ?></td>
                             <td><?= h($borrowRequest->return_date) ?></td>
                             <td><?= h($borrowRequest->return_time ?? 'N/A') ?></td>
                             <td><?= h($borrowRequest->overdue_duration ?? '-') ?></td>
+                            <td><?= h($borrowRequest->returned_damaged ?? 0) ?> pcs</td>
                             <td>
                                 <?= $this->Form->postLink(
                                     'Delete',
@@ -94,7 +101,7 @@
                         </tr>
                     <?php endforeach; ?>
                 <?php else: ?>
-                    <tr><td colspan="9">No history found for the provided criteria.</td></tr>
+                    <tr><td colspan="10">No history found for the provided criteria.</td></tr>
                 <?php endif; ?>
             </tbody>
         </table>
