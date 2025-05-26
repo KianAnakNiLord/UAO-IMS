@@ -18,16 +18,11 @@ class BorrowRequestsController extends AppController
     $this->BorrowRequests = $this->fetchTable('BorrowRequests');
     $this->InventoryItems = $this->fetchTable('InventoryItems');
 }
-
-
-
-    // ✅ Borrower - View Their Own Requests
     public function index()
 {
     $user = $this->request->getAttribute('identity');
     $isAdmin = $user && $user->get('role') === 'admin';
 
-    // ✅ Auto-mark overdue if return_date + return_time is in the past — ONLY for approved
     $now = new \DateTime();
 
     $overdueRequests = $this->BorrowRequests->find()
@@ -69,18 +64,13 @@ class BorrowRequestsController extends AppController
             }
         }
     }
-
-    // ✅ Pagination config: limit 5 per page
-    // ✅ Get status filter from query string
 $statusFilter = $this->request->getQuery('status');
 
-// ✅ Pagination config: limit 5 per page
 $this->paginate = [
     'limit' => 5,
     'order' => ['BorrowRequests.created' => 'desc']
 ];
 
-// ✅ Build dynamic query based on role and status
 $conditions = [];
 
 if (!$isAdmin) {
@@ -90,27 +80,18 @@ if (!$isAdmin) {
 if (!empty($statusFilter)) {
     $conditions['status'] = $statusFilter;
 }
-
-// ✅ Query with conditions and associations
 $query = $this->BorrowRequests->find()
     ->where($conditions)
     ->contain(['Users', 'InventoryItems']);
 
-// ✅ Paginate and pass filter to view
 $borrowRequests = $this->paginate($query);
 $this->set(compact('borrowRequests', 'statusFilter'));
 
 }
-
-
-   // ✅ Borrower - Submit Request
-    // ✅ Borrower - Submit Request
     public function add()
 {
     $identity = $this->request->getAttribute('identity');
     $userId = $identity->get('id');
-
-    // ✅ BLOCK users with existing overdue requests
     $hasOverdue = $this->BorrowRequests
         ->find()
         ->where(['user_id' => $userId, 'status' => 'overdue'])
@@ -125,17 +106,12 @@ $this->set(compact('borrowRequests', 'statusFilter'));
 
     if ($this->request->is('post')) {
         $data = $this->request->getData();
-
-        // Automatically set user_id and status
         $data['user_id'] = $userId;
         $data['status'] = 'pending';
 
-        // Convert return_time to proper format
         if (!empty($data['return_time'])) {
             $data['return_time'] = date('H:i:s', strtotime($data['return_time']));
         }
-
-        // ✅ Prevent past return datetime
         $returnDate = $data['return_date'] ?? null;
         $returnTime = $data['return_time'] ?? null;
 
@@ -148,8 +124,6 @@ $this->set(compact('borrowRequests', 'statusFilter'));
                 return $this->redirect(['action' => 'add']);
             }
         }
-
-        // ✅ Handle ID image upload with file type and size validation
         $file = $this->request->getData('id_image');
         if ($file instanceof \Laminas\Diactoros\UploadedFile && $file->getError() === 0) {
             $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
@@ -171,8 +145,6 @@ $this->set(compact('borrowRequests', 'statusFilter'));
         } else {
             $data['id_image'] = null;
         }
-
-        // Patch and save the request
         $borrowRequest = $this->BorrowRequests->patchEntity($borrowRequest, $data);
 
         if ($this->BorrowRequests->save($borrowRequest)) {
@@ -182,23 +154,18 @@ $this->set(compact('borrowRequests', 'statusFilter'));
 
         $this->Flash->error('Could not submit request.');
     }
-
-    // Fetch inventory items for the form dropdown
     $this->InventoryItems = $this->fetchTable('InventoryItems');
 $flatInventory = $this->InventoryItems
     ->find()
     ->where([
         'item_condition !=' => 'damaged',
-        'quantity >' => 0 // ✅ Hide zero-quantity items
+        'quantity >' => 0 
     ])
     ->toArray();
 
 $this->set(compact('borrowRequest', 'flatInventory'));
 
 }
-
-
-    // ✅ Admin - Approve Request
     public function approve($id)
     {
         $request = $this->BorrowRequests->get($id);
@@ -208,8 +175,6 @@ $this->set(compact('borrowRequest', 'flatInventory'));
         $this->Flash->success('Request approved.');
         return $this->redirect(['action' => 'index']);
     }
-
-    // ✅ Admin - Reject Request
     public function reject($id)
     {
         $request = $this->BorrowRequests->get($id);
@@ -219,8 +184,6 @@ $this->set(compact('borrowRequest', 'flatInventory'));
         $this->Flash->error('Request rejected.');
         return $this->redirect(['action' => 'index']);
     }
-
-    // ✅ Admin - Mark as Returned
     public function returned($id)
     {
         $request = $this->BorrowRequests->get($id);
@@ -231,9 +194,6 @@ $this->set(compact('borrowRequest', 'flatInventory'));
         $this->Flash->success('Marked as returned.');
         return $this->redirect(['action' => 'index']);
     }
-
-
-
 public function viewReason($id = null)
 {
     $request = $this->BorrowRequests->get($id, [
@@ -242,17 +202,12 @@ public function viewReason($id = null)
 
     $this->set(compact('request'));
 }
-
-// BorrowRequestsController.php
-
 public function delete($id = null)
 {
     $this->request->allowMethod(['post', 'delete']);
     $borrowRequest = $this->BorrowRequests->get($id);
 
     $identity = $this->request->getAttribute('identity');
-
-    // ✅ Only allow delete if owner and status is 'pending' or 'rejected'
     if ($borrowRequest->user_id !== $identity->get('id')) {
         $this->Flash->error(__('You are not authorized to delete this request.'));
         return $this->redirect(['action' => 'index']);
@@ -271,17 +226,12 @@ public function delete($id = null)
 
     return $this->redirect(['action' => 'index']);
 }
-
-
 public function dashboard()
 {
-    $user = $this->request->getAttribute('identity'); // Get the logged-in user
+    $user = $this->request->getAttribute('identity'); 
     if (!$user) {
-        // Redirect if the user is not logged in
         return $this->redirect(['controller' => 'Users', 'action' => 'login']);
     }
-
-    // Fetch borrow requests for the logged-in user
     $borrowRequests = $this->BorrowRequests->find('all')
         ->where(['user_id' => $user->id])
         ->contain(['InventoryItems'])
@@ -294,7 +244,7 @@ public function checkTime()
     echo "<h3>Server Time:</h3>";
     echo date('Y-m-d H:i:s');
     echo "<br><br><strong>Timezone used:</strong> " . date_default_timezone_get();
-    phpinfo(); // Show all PHP config (scroll to 'date' section)
+    phpinfo();
     exit;
 }
 public function viewApproval($id = null)
@@ -314,14 +264,11 @@ public function viewRemark($id = null)
 
     $this->set(compact('request'));
 }
-
-
 public function edit($id = null)
 {
     $user = $this->request->getAttribute('identity');
     $borrowRequest = $this->BorrowRequests->get($id);
 
-    // ✅ Allow only the owner to edit pending requests
     if (!$user || $user->id !== $borrowRequest->user_id || $borrowRequest->status !== 'pending') {
         $this->Flash->error('You are not allowed to edit this request.');
         return $this->redirect(['action' => 'index']);
@@ -330,12 +277,10 @@ public function edit($id = null)
     if ($this->request->is(['patch', 'post', 'put'])) {
         $data = $this->request->getData();
 
-        // Convert time properly
         if (!empty($data['return_time'])) {
             $data['return_time'] = date('H:i:s', strtotime($data['return_time']));
         }
 
-        // ✅ Validate that return date/time is still in the future
         if (!empty($data['return_date']) && !empty($data['return_time'])) {
             $returnDateTime = new \DateTime("{$data['return_date']} {$data['return_time']}");
             $now = new \DateTime();
@@ -344,28 +289,25 @@ public function edit($id = null)
                 return $this->redirect(['action' => 'edit', $id]);
             }
         }
-
-        // ✅ Update ID image if reuploaded
         $file = $this->request->getData('id_image');
         if ($file instanceof \Laminas\Diactoros\UploadedFile && $file->getError() === 0) {
             $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
             $maxSize = 2 * 1024 * 1024;
 
             if (!in_array($file->getClientMediaType(), $allowedTypes)) {
-                $this->Flash->error('Only JPG, PNG, and GIF files are allowed.');
-                return $this->redirect(['action' => 'edit', $id]);
-            }
-
+    $this->set('fileUploadError', 'Only JPG, PNG, and GIF files are allowed.');
+    $this->set(compact('borrowRequest')); 
+    return; 
+}
             if ($file->getSize() > $maxSize) {
                 $this->Flash->error('The image must be less than 2MB.');
                 return $this->redirect(['action' => 'edit', $id]);
             }
-
             $filename = time() . '_' . $file->getClientFilename();
             $file->moveTo(WWW_ROOT . 'uploads' . DS . $filename);
             $data['id_image'] = 'uploads/' . $filename;
         } else {
-            unset($data['id_image']); // Leave existing image unchanged
+            unset($data['id_image']); 
         }
 
         $this->BorrowRequests->patchEntity($borrowRequest, $data);
@@ -377,8 +319,6 @@ public function edit($id = null)
 
         $this->Flash->error('Could not update the request.');
     }
-
-    // ✅ Fetch inventory items again
     $flatInventory = $this->InventoryItems
         ->find()
         ->where(['item_condition !=' => 'damaged', 'quantity >' => 0])

@@ -1,6 +1,26 @@
 <?= $this->Html->css('decision_form') ?>
 
 <div class="reject-form-wrapper">
+    <div id="errorPopup" style="
+    display: none;
+    position: fixed;
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    color: red;
+    border: 2px solid red;
+    padding: 16px 24px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    font-weight: bold;
+    text-align: center;
+    max-width: 90%;
+    width: fit-content;
+    z-index: 9999;
+"></div>
+
+
     <div class="reject-form-card">
         <h2 class="reject-title">Approve Borrow Request</h2>
 
@@ -11,17 +31,16 @@
         <div class="info-row"><strong>Quantity:</strong> <?= h($request->quantity_requested) ?></div>
 
         <div class="form-group">
-    <?= $this->Form->label('approval_note', 'Approval Note (Optional)') ?>
-    <?= $this->Form->textarea('approval_note', [
-        'id' => 'approvalNote',
-        'maxlength' => 75,
-        'placeholder' => 'You can leave a note for the borrower...',
-        'style' => 'resize: none;',
-        'class' => 'form-control'
-    ]) ?>
-    <small id="approvalCharCount" style="font-size: 13px; color: #666; display: block; margin-top: 6px;">0 / 75</small>
-</div>
-
+            <?= $this->Form->label('approval_note', 'Approval Note (Optional)') ?>
+            <?= $this->Form->textarea('approval_note', [
+                'id' => 'approvalNote',
+                'maxlength' => 75,
+                'placeholder' => 'You can leave a note for the borrower...',
+                'style' => 'resize: none;',
+                'class' => 'form-control'
+            ]) ?>
+            <small id="approvalCharCount" style="font-size: 13px; color: #666; display: block; margin-top: 6px;">0 / 75</small>
+        </div>
 
         <div class="form-buttons">
             <?= $this->Form->button('Confirm Approval', ['class' => 'reject-btn']) ?>
@@ -31,9 +50,9 @@
         <?= $this->Form->end() ?>
     </div>
 </div>
+
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // Approval Note
     const approvalInput = document.getElementById('approvalNote');
     const approvalCounter = document.getElementById('approvalCharCount');
 
@@ -44,8 +63,6 @@ document.addEventListener('DOMContentLoaded', () => {
             approvalCounter.style.color = length > 75 ? 'red' : '#666';
         });
     }
-
-    // Rejection Reason
     const rejectionInput = document.getElementById('rejectionReason');
     const rejectionCounter = document.getElementById('rejectionCharCount');
 
@@ -58,3 +75,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 </script>
+<?php if (!empty($flashError)): ?>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const flashMessage = <?= json_encode($flashError) ?>;
+
+    const errorPopup = document.getElementById('errorPopup');
+
+    if (errorPopup && flashMessage) {
+        errorPopup.textContent = flashMessage;
+        errorPopup.style.display = 'block';
+
+        setTimeout(() => {
+            errorPopup.style.display = 'none';
+        }, 3000);
+    }
+});
+</script>
+<?php endif; ?>

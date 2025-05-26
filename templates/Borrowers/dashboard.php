@@ -36,5 +36,3 @@
         </ol>
     </section>
 </div>
-
-

@@ -7,20 +7,16 @@ use App\Model\Table\BorrowRequestsTable;
 use Cake\TestSuite\TestCase;
 
 /**
- * App\Model\Table\BorrowRequestsTable Test Case
+ * BorrowRequestsTable Test Case
  */
 class BorrowRequestsTableTest extends TestCase
 {
     /**
-     * Test subject
-     *
      * @var \App\Model\Table\BorrowRequestsTable
      */
     protected $BorrowRequests;
 
     /**
-     * Fixtures
-     *
      * @var list<string>
      */
     protected array $fixtures = [
@@ -29,11 +25,6 @@ class BorrowRequestsTableTest extends TestCase
         'app.InventoryItems',
     ];
 
-    /**
-     * setUp method
-     *
-     * @return void
-     */
     protected function setUp(): void
     {
         parent::setUp();
@@ -41,37 +32,30 @@ class BorrowRequestsTableTest extends TestCase
         $this->BorrowRequests = $this->getTableLocator()->get('BorrowRequests', $config);
     }
 
-    /**
-     * tearDown method
-     *
-     * @return void
-     */
     protected function tearDown(): void
     {
         unset($this->BorrowRequests);
-
         parent::tearDown();
     }
 
     /**
-     * Test validationDefault method
-     *
-     * @return void
-     * @uses \App\Model\Table\BorrowRequestsTable::validationDefault()
+     * Test saving a valid borrow request
      */
-    public function testValidationDefault(): void
+    public function testSaveValidBorrowRequest(): void
     {
-        $this->markTestIncomplete('Not implemented yet.');
-    }
+        $data = [
+            'user_id' => 1,
+            'inventory_item_id' => 1,
+            'status' => 'pending',
+            'quantity_requested' => 1,
+            'return_date' => '2025-07-01',
+            'return_time' => '15:00:00'
+        ];
 
-    /**
-     * Test buildRules method
-     *
-     * @return void
-     * @uses \App\Model\Table\BorrowRequestsTable::buildRules()
-     */
-    public function testBuildRules(): void
-    {
-        $this->markTestIncomplete('Not implemented yet.');
+        $entity = $this->BorrowRequests->newEntity($data);
+        $this->assertEmpty($entity->getErrors(), 'Validation errors occurred.');
+
+        $saved = $this->BorrowRequests->save($entity);
+        $this->assertNotFalse($saved, 'Failed to save valid borrow request.');
     }
 }

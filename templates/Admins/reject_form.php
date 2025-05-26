@@ -34,7 +34,6 @@
 </div>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // Approval Note
     const approvalInput = document.getElementById('approvalNote');
     const approvalCounter = document.getElementById('approvalCharCount');
 
@@ -45,8 +44,6 @@ document.addEventListener('DOMContentLoaded', () => {
             approvalCounter.style.color = length > 75 ? 'red' : '#666';
         });
     }
-
-    // Rejection Reason
     const rejectionInput = document.getElementById('rejectionReason');
     const rejectionCounter = document.getElementById('rejectionCharCount');
 

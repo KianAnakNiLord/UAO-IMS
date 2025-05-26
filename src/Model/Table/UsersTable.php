@@ -106,9 +106,8 @@ public function findOrCreateFromSocial($data)
 
     // ✅ Domain restriction
     if (!str_ends_with($data['email'], '@my.xu.edu.ph')) {
-    // Custom 403 with themed layout support
-    throw new ForbiddenException('Only @my.xu.edu.ph emails are allowed.');
-}
+        throw new ForbiddenException('Only @my.xu.edu.ph emails are allowed.');
+    }
 
     $provider = strtolower($data['provider'] ?? 'google');
     $identifier = (string)($data['identifier'] ?? '');
@@ -165,6 +164,17 @@ public function findOrCreateFromSocial($data)
 
     \Cake\Log\Log::write('error', "✅ Creating NEW social profile for $identifier");
 
+    // 🔒 Final duplicate check before insert
+    $alreadyExists = $socialProfilesTable->exists([
+        'provider' => $provider,
+        'identifier' => $identifier
+    ]);
+
+    if ($alreadyExists) {
+        \Cake\Log\Log::write('debug', "🛑 Profile already exists at final check. Skipping insert.");
+        return $user;
+    }
+
     $socialProfile = $socialProfilesTable->newEntity([
         'user_id' => $user->id,
         'provider' => $provider,
@@ -178,27 +188,19 @@ public function findOrCreateFromSocial($data)
         'raw_data' => json_encode($data),
     ]);
 
-    try {
-        $socialProfilesTable->saveOrFail($socialProfile);
-    } catch (\Cake\ORM\Exception\PersistenceFailedException $e) {
-        // 🛑 Log and retry in case of race condition
-        \Cake\Log\Log::write('warning', "⚠️ Race condition: profile likely inserted by parallel request. Retrying lookup...");
+    if (!$socialProfilesTable->save($socialProfile)) {
+        \Cake\Log\Log::write('warning', "❗ Save failed. Retrying lookup in case it was inserted in parallel...");
 
-        $existingProfile = $socialProfilesTable->find()
+        $fallback = $socialProfilesTable->find()
             ->where(['provider' => $provider, 'identifier' => $identifier])
             ->first();
 
-        if ($existingProfile) {
-            \Cake\Log\Log::write('error', "✅ Found profile after failed insert for $identifier");
+        if ($fallback) {
+            \Cake\Log\Log::write('debug', "✅ Found profile after failed save. Returning user.");
             return $user;
         }
 
-        // 🔥 Rethrow if truly failed
-        \Cake\Log\Log::write('error', "❌ Insert and fallback both failed: " . $e->getMessage());
-        throw $e;
-    } catch (\Exception $e) {
-        \Cake\Log\Log::write('error', "❌ General insert error: " . $e->getMessage());
-        throw $e;
+        throw new \RuntimeException("❌ Could not save or find social profile for: $identifier");
     }
 
     return $user;

@@ -7,32 +7,24 @@ use App\Model\Table\InventoryItemsTable;
 use Cake\TestSuite\TestCase;
 
 /**
- * App\Model\Table\InventoryItemsTable Test Case
+ * InventoryItemsTable Test Case
  */
 class InventoryItemsTableTest extends TestCase
 {
     /**
-     * Test subject
-     *
      * @var \App\Model\Table\InventoryItemsTable
      */
     protected $InventoryItems;
 
     /**
-     * Fixtures
-     *
      * @var list<string>
      */
     protected array $fixtures = [
-        'app.InventoryItems',
-        'app.BorrowRequests',
-    ];
+    'app.Users',
+    'app.InventoryItems',
+    // 'app.BorrowRequests', ← comment or remove this!
+];
 
-    /**
-     * setUp method
-     *
-     * @return void
-     */
     protected function setUp(): void
     {
         parent::setUp();
@@ -40,26 +32,31 @@ class InventoryItemsTableTest extends TestCase
         $this->InventoryItems = $this->getTableLocator()->get('InventoryItems', $config);
     }
 
-    /**
-     * tearDown method
-     *
-     * @return void
-     */
     protected function tearDown(): void
     {
         unset($this->InventoryItems);
-
         parent::tearDown();
     }
 
     /**
-     * Test validationDefault method
-     *
-     * @return void
-     * @uses \App\Model\Table\InventoryItemsTable::validationDefault()
+     * Test saving a valid inventory item
      */
-    public function testValidationDefault(): void
+    public function testSaveValidInventoryItem(): void
     {
-        $this->markTestIncomplete('Not implemented yet.');
+        $data = [
+            'name' => 'Official Basketball',
+            'category' => 'equipment',
+            'item_condition' => 'new',
+            'quantity' => 5,
+            'procurement_date' => '2024-01-15',
+            'description' => 'Molten brand, leather',
+            'location' => 'UAO-Storage'
+        ];
+
+        $entity = $this->InventoryItems->newEntity($data);
+        $this->assertEmpty($entity->getErrors(), 'Validation errors found on valid inventory item.');
+
+        $saved = $this->InventoryItems->save($entity);
+        $this->assertNotFalse($saved, 'Valid inventory item could not be saved.');
     }
 }

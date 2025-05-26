@@ -73,4 +73,25 @@ class UsersTableTest extends TestCase
     {
         $this->markTestIncomplete('Not implemented yet.');
     }
+    public function testSaveValidBorrowerUser(): void
+{
+    $data = [
+        'name' => 'Juan Dela Cruz',
+        'email' => 'juan@my.xu.edu.ph',
+        'password' => 'Password123!',
+        'role' => 'borrower',
+        'is_verified' => false,
+        'otp_code' => '123456',
+        'otp_expires_at' => date('Y-m-d H:i:s', strtotime('+10 minutes'))
+    ];
+
+    $entity = $this->Users->newEntity($data);
+
+    $this->assertEmpty($entity->getErrors(), 'Validation errors found on valid user data.');
+
+    $saved = $this->Users->save($entity);
+
+    $this->assertNotFalse($saved, 'Valid borrower user could not be saved.');
+}
+
 }

@@ -72,7 +72,7 @@ class BorrowRequestsTable extends Table
 
             $validator
             ->integer('inventory_item_id')
-            ->allowEmptyString('inventory_item_id'); // ✅ allow null if deleted
+            ->allowEmptyString('inventory_item_id'); 
         
 
         $validator
@@ -86,11 +86,9 @@ class BorrowRequestsTable extends Table
         $validator
             ->date('return_date')
             ->allowEmptyDate('return_date');
-
-        // Validate return_time (add if necessary)
         $validator
             ->time('return_time', 'Please provide a valid time for Return Time')
-            ->allowEmptyString('return_time');  // Optional, if you want to allow empty time
+            ->allowEmptyString('return_time');  
 
             $validator
     ->scalar('overdue_duration')
@@ -112,9 +110,8 @@ class BorrowRequestsTable extends Table
     $rules->add($rules->existsIn(['user_id'], 'Users'), ['errorField' => 'user_id']);
     $rules->add($rules->existsIn(['inventory_item_id'], 'InventoryItems'), ['errorField' => 'inventory_item_id']);
 
-    // ✅ Only run this rule when adding a new borrow request
     $rules->add(function ($entity, $options) {
-        // Only validate on NEW requests
+      
         if ($entity->isNew()) {
             $inventoryTable = $this->getAssociation('InventoryItems')->getTarget();
             $item = $inventoryTable->get($entity->inventory_item_id);

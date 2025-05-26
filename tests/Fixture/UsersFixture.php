@@ -10,24 +10,38 @@ use Cake\TestSuite\Fixture\TestFixture;
  */
 class UsersFixture extends TestFixture
 {
-    /**
-     * Init method
-     *
-     * @return void
-     */
     public function init(): void
     {
         $this->records = [
+            // ✅ Admin user for AdminsController tests
             [
                 'id' => 1,
-                'role' => 'Lorem ipsum dolor sit amet',
-                'name' => 'Lorem ipsum dolor sit amet',
-                'email' => 'Lorem ipsum dolor sit amet',
-                'password' => 'Lorem ipsum dolor sit amet',
-                'created' => '2025-04-18 10:24:12',
-                'modified' => '2025-04-18 10:24:12',
+                'name' => 'Admin User',
+                'email' => 'admin@uao.test',
+                'password' => 'admin123', // You can replace this with a hashed password if needed
+                'role' => 'admin',
+                'is_verified' => true,
+                'otp_code' => null,
+                'otp_expires_at' => null,
+                'created' => '2025-01-01 00:00:00',
+                'modified' => '2025-01-01 00:00:00'
+            ],
+
+            // ✅ Borrower user for BorrowRequestsController tests
+            [
+                'id' => 2,
+                'name' => 'Test User',
+                'email' => 'test@my.xu.edu.ph',
+                'password' => 'password',
+                'role' => 'borrower',
+                'is_verified' => true,
+                'otp_code' => null,
+                'otp_expires_at' => null,
+                'created' => '2025-01-01 00:00:00',
+                'modified' => '2025-01-01 00:00:00'
             ],
         ];
+
         parent::init();
     }
 }

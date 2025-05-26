@@ -3,15 +3,11 @@
 <h2 class="history-title">Borrow History</h2>
 
 <div class="history-container">
-    <!-- 🔍 Search + Intro -->
     <div class="history-search">
         <div class="search-intro-wrapper">
-            <!-- 🏫 Logo -->
             <div class="search-intro-left">
                 <img src="<?= $this->Url->image('cruslogo.png') ?>" alt="Xavier Logo" class="history-logo-img">
             </div>
-
-            <!-- 📄 Instructions + 🔎 Form -->
             <div class="search-intro-right">
                 <p class="history-subtext">
                     This section displays the full borrowing history. Use the fields below to search by borrower name or email and view all returned, overdue, and approved requests.
@@ -34,8 +30,6 @@
                             'placeholder' => 'Enter email to search'
                         ]) ?>
                     </div>
-
-                    <!-- ✅ Overdue Filter Checkbox -->
                     <div class="input">
                         <?= $this->Form->control('only_overdue', [
                             'type' => 'checkbox',
@@ -49,8 +43,6 @@
             </div>
         </div>
     </div>
-
-    <!-- 📋 Display Table -->
     <div class="history-wrapper">
         <table class="history-table">
             <thead>
@@ -107,8 +99,6 @@
             </tbody>
         </table>
     </div>
-
-    <!-- 📄 Pagination -->
     <div class="history-pagination">
         <ul class="pagination">
             <?= $this->Paginator->first('<< ' . __('first')) ?>

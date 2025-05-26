@@ -11,8 +11,8 @@
     display: none;
     margin: 0 auto;
     background: white;
-    color: #B99433;
-    border: 2px solid #B99433;
+    color: red;               /* changed to red */
+    border: 2px solid red;
     padding: 16px 24px;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.2);
@@ -82,11 +82,14 @@
                 ]) ?>
 
                 <?= $this->Form->control('return_time', [
-                    'label' => 'Return Time',
-                    'type' => 'time',
-                    'empty' => true,
-                    'required' => true
-                ]) ?>
+    'label' => 'Return Time',
+    'type' => 'time',
+    'empty' => true,
+    'required' => true,
+    'min' => '06:00',
+    'max' => '17:00',
+]) ?>
+
 
                <div class="form-group">
     <?= $this->Form->label('purpose', 'Purpose') ?>
@@ -243,6 +246,20 @@ document.addEventListener('DOMContentLoaded', function () {
             errorPopup.style.display = 'none';
         }, 3000);
     }
+    returnTimeInput?.addEventListener('input', function () {
+    const val = returnTimeInput.value;
+    if (val < '06:00' || val > '17:00') {
+        showError('Return Time must be between 6:00 AM and 5:00 PM.');
+        returnTimeInput.value = '';
+    }
+});
+
 });
 </script>
-
+<?php if (!empty($fileUploadError)): ?>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    showError("<?= h($fileUploadError) ?>");
+  });
+</script>
+<?php endif; ?>

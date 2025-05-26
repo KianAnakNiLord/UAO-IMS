@@ -211,13 +211,39 @@ public function inventory()
         $approvalNote = trim((string) $this->request->getData('approval_note'));
 
         if (strlen($approvalNote) > 75) {
-            $this->Flash->error('Approval note must not exceed 75 characters.');
-            return $this->redirect(['action' => 'approveRequest', $id]);
+            $this->set('flashError', 'Approval note must not exceed 75 characters.');
+            $this->set(compact('request'));
+            return $this->render('approve_form');
         }
 
         $request->approval_note = $approvalNote;
         $item = $request->inventory_item;
-        $item->quantity -= $request->quantity_requested;
+
+        // ✅ NEW: Prevent over-approval with safe inventory check
+        $query = $this->BorrowRequests->find();
+        $approvedQtyResult = $query
+            ->select([
+                'total' => $query->func()->sum('quantity_requested')
+            ])
+            ->where([
+                'inventory_item_id' => $item->id,
+                'status' => 'approved'
+            ])
+            ->first();
+
+        $approvedQty = $approvedQtyResult->total ?? 0;
+        $availableQty = $item->quantity - $approvedQty;
+        $requestedQty = $request->quantity_requested;
+
+        if ($requestedQty > $availableQty) {
+            $this->set('flashError', "Not enough inventory to approve this request. Only {$availableQty} available.");
+$this->set(compact('request'));
+return $this->render('approve_form');
+
+        }
+
+        // ✅ Proceed if enough inventory
+        $item->quantity -= $requestedQty;
         $item->setDirty('quantity', true);
 
         $saveRequest = $this->BorrowRequests->save($request);
@@ -258,7 +284,6 @@ public function inventory()
     $this->set(compact('request'));
     $this->render('approve_form');
 }
-
 
 public function rejectRequest($id = null)
 {
@@ -311,17 +336,11 @@ public function rejectRequest($id = null)
 
     return $this->redirect(['action' => 'borrowRequests']);
 }
-
-
-
-
-
     public function rejectForm($id)
     {
         $request = $this->BorrowRequests->get($id, ['contain' => ['Users', 'InventoryItems']]);
         $this->set(compact('request'));
     }
-
     public function adminDashboard()
     {
         $this->autoMarkOverdue();
@@ -340,7 +359,6 @@ public function rejectRequest($id = null)
 
         $this->set(compact('borrowRequests'));
     }
-
     public function history()
 {
     // Get search queries from GET

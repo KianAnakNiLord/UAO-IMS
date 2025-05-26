@@ -4,7 +4,6 @@
     <h1 class="dashboard-title">Admin Dashboard</h1>
     <p class="welcome-msg">Welcome, <strong><?= h($user->name) ?></strong>! You are logged in as an administrator.</p>
 
-    <!-- 🔢 Quick Stats -->
     <div class="card-section">
         <h2 class="section-title">Quick Stats</h2>
         <div class="stats-grid">
@@ -30,8 +29,6 @@
             </div>
         </div>
     </div>
-
-    <!-- 🚀 Quick Access -->
     <div class="card-section">
         <h2 class="section-title">Quick Access</h2>
         <div class="shortcut-grid">
@@ -42,8 +39,6 @@
             <?= $this->Html->link('Export PDF', ['action' => 'exportInventoryPdf'], ['class' => 'btn shortcut']) ?>
         </div>
     </div>
-
-    <!-- ⏰ Upcoming Returns -->
     <div class="card-section">
         <h2 class="section-title">Upcoming Returns (Next 3 Days)</h2>
         <?php if ($upcomingReturns->isEmpty()): ?>
@@ -60,8 +55,6 @@
             </ul>
         <?php endif; ?>
     </div>
-
-    <!-- 📌 Notes -->
     <div class="card-section">
         <h2 class="section-title">Admin Notes</h2>
         <ul class="admin-notes">

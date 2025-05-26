@@ -32,7 +32,7 @@ return function (RouteBuilder $routes): void {
         $builder->connect('/users/login', ['controller' => 'Users', 'action' => 'login']);
         $builder->connect('/users/register', ['controller' => 'Users', 'action' => 'register']);
         $builder->connect('/users/logout', ['controller' => 'Users', 'action' => 'logout']);
-
+        
         // Borrowers
         $builder->connect('/borrowers/dashboard', ['controller' => 'Borrowers', 'action' => 'dashboard']);
         $builder->connect('/borrowers/borrow', ['controller' => 'Borrowers', 'action' => 'borrow']);
@@ -40,6 +40,7 @@ return function (RouteBuilder $routes): void {
         // Admins
         $builder->connect('/admins/dashboard', ['controller' => 'Admins', 'action' => 'dashboard']);
         $builder->connect('/admins/inventory', ['controller' => 'Admins', 'action' => 'inventory']);
+        
         $builder->connect('/admins/borrow_requests', ['controller' => 'Admins', 'action' => 'borrowRequests']);
         $builder->connect('/admins/borrow-history', ['controller' => 'Admins', 'action' => 'history']);
         $builder->connect('/admins/approved-requests', ['controller' => 'Admins', 'action' => 'approvedRequests']);

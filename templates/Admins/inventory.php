@@ -35,7 +35,7 @@
             'default' => $this->request->getQuery('condition')
         ]) ?>
 
-        <?= $this->Form->control('location', [ // ✅ Location filter added
+        <?= $this->Form->control('location', [
             'label' => 'Location',
             'options' => [
                 '' => 'All',

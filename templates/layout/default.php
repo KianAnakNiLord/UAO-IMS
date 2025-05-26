@@ -24,7 +24,7 @@ $role = $identity ? $identity->get('role') : null;
                 'alt' => 'UAO Logo',
                 'style' => 'max-width: 100px; display: block; margin: 0 auto 10px;'
             ]) ?>
-            <h2 style="color: white; text-align: center;">UAO-IMS & BS</h2>
+            <h2 style="color: white; text-align: center;">Univeristy Athletics Office</h2>
         </div>
 
         <nav class="nav-links">
@@ -44,7 +44,7 @@ $role = $identity ? $identity->get('role') : null;
                 <?= $this->Html->link('Logout', '/users/logout', ['class' => 'nav-item logout']) ?>
             <?php else: ?>
                 <?= $this->Html->link('Login', '/users/login', ['class' => 'nav-item']) ?>
-                <?= $this->Html->link('Register', '/users/register', ['class' => 'nav-item']) ?>
+                
             <?php endif; ?>
         </nav>
     </aside>

@@ -143,6 +143,26 @@ input[type="file"]::file-selector-button {
 input[type="file"]::file-selector-button:hover {
     background-color: #2e418a;
 }
+#errorPopup {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    color: red; /* changed to red */
+    border: 2px solid red; /* changed to red */
+    padding: 16px 24px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    font-weight: bold;
+    text-align: center;
+    max-width: 90%;
+    width: fit-content;
+    z-index: 9999;
+}
+
+
 
 
 
